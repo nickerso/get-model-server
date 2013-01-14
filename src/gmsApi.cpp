@@ -93,7 +93,6 @@ bool API::executeAPI(const std::string& url, const std::map<std::string, std::st
             abort();
         }
         Json::Value charts;
-        Json::Value curve, data;
         int dCounter = 0;
         charts["id"] = "sine_approximations_import";
         std::vector<double> dataValues = csim.getModelOutputs();
@@ -124,32 +123,8 @@ bool API::executeAPI(const std::string& url, const std::map<std::string, std::st
             ++dCounter;
             t += dt;
         }
-        /*
-        series["id"] = "Membrane Voltage";
-        data[0u]["x"] = 0.0;
-        data[0u]["y"] = 0.0;
-        data[1]["x"] = 1.5;
-        data[1]["y"] = 5.0;
-        data[2]["x"] = 3.8;
-        data[2]["y"] = 4.1;
-        data[3]["x"] = 8.7;
-        data[3]["y"] = 7.0;
-        series["data"] = data;
-        root["series"][0u] = series;
-        series["id"] = "SomethingElse";
-        data[0u]["x"] = -1.0;
-        data[0u]["y"] = -2.0;
-        data[1]["x"] = 1.4;
-        data[1]["y"] = 5.0;
-        data[2]["x"] = 3.8;
-        data[2]["y"] = -4.1;
-        data[3]["x"] = 8.7;
-        data[3]["y"] = 7.0;
-        series["data"] = data;
-        root["series"][1] = series;*/
-        //std::cout << root;
+        //std::cout << charts;
         response = Json::FastWriter().write(charts);
-        //sleep(2);
     }
     else
     {
