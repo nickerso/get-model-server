@@ -15,7 +15,7 @@ ENDIF(WIN32)
 FIND_PACKAGE(LibMicroHttpd REQUIRED)
 FIND_PACKAGE(LibCSim REQUIRED)
 
-set(PLATFORM_LIBS "")
+set(PLATFORM_LIBS "curl")
 
 # Set compiler flags
 if (WIN32)

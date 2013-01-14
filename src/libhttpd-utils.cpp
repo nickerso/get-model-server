@@ -195,8 +195,7 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
         return send_bad_response(connection);
     }
 
-    std::cout << "data->dataString: " << data->dataString.c_str() << std::endl;
-    api.executeAPI(url, url_args, respdata);
+    respdata = api.executeAPI(url, url_args, data);
 
     *ptr = 0; /* reset when done */
     //val = MHD_lookup_connection_value (connection, MHD_GET_ARGUMENT_KIND, "q");

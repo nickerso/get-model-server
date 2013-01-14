@@ -26,13 +26,13 @@ API::~API()
 const char API::URL_MODEL[] = "/model/";
 const char API::URL_EXECUTE[] = "/execute/";
 
-bool API::executeAPI(const std::string& url, const std::map<std::string, std::string>& argvals,
-                     std::string& response)
+std::string API::executeAPI(const std::string& url, const std::map<std::string, std::string>& argvals,
+                            GMS::Data *data)
 {
+    std::string response;
     std::cout << "executeAPI for URL: \"" << url.c_str() << "\"" << std::endl;
     std::string modelUrl = url.substr(0, strlen(URL_MODEL));
     std::string executeUrl = url.substr(0, strlen(URL_EXECUTE));
-    bool ret = false;
     // http://localhost/model, http://localhost/model/model_id, http://localhost/model/, http://localhost/model?q=bob all valid
     if ((modelUrl == "/model/" ) || (modelUrl == "/model"))
     {
@@ -130,7 +130,7 @@ bool API::executeAPI(const std::string& url, const std::map<std::string, std::st
     {
         getInvalidResponse(response);
     }
-    return ret;
+    return response;
 }
 void API::getInvalidResponse(std::string& response)
 {
