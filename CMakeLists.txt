@@ -14,8 +14,9 @@ ENDIF(WIN32)
 
 FIND_PACKAGE(LibMicroHttpd REQUIRED)
 FIND_PACKAGE(LibCSim REQUIRED)
+FIND_PACKAGE(LibCsedml REQUIRED)
 
-set(PLATFORM_LIBS "curl")
+set(PLATFORM_LIBS "curl" "xml2")
 
 # Set compiler flags
 if (WIN32)
@@ -28,6 +29,7 @@ endif(WIN32)
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_SOURCE_DIR}/jsoncpp
+  ${clibsedml_INCLUDE_DIRS}
   ${libcsim_INCLUDE_DIRS}
   ${libmicrohttpd_INCLUDE_DIRS}
 )
@@ -46,5 +48,6 @@ ADD_EXECUTABLE(${EXECUTABLE_NAME} ${SRCS})
 TARGET_LINK_LIBRARIES(${EXECUTABLE_NAME}
   ${libmicrohttpd_LIBRARIES}
   ${libcsim_LIBRARIES}
+  ${clibsedml_LIBRARIES}
   ${PLATFORM_LIBS}
 )

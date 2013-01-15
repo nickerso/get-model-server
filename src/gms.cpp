@@ -21,7 +21,6 @@ int main(int argc, char ** argv)
     GMS::Data* data = new GMS::Data();
     if (0 == strcmp(argv[2], "GMS"))
 	{
-        std::cout << "Bobby!" << std::endl;
         int code = data->initialiseModelDatabase("http://localhost:9876/models/");
         if (code != 0)
         {

@@ -2,6 +2,7 @@
 #include <curl/curl.h>
 #include <vector>
 #include <sstream>
+#include <sedml/reader.h>
 
 #include "gmsData.hpp"
 
@@ -67,6 +68,26 @@ int Data::initialiseModelDatabase(const std::string &repositoryRoot)
         return -1;
     }
     mModelList = splitString(data, '\n', mModelList);
+
+    struct sedml_document* doc = sedml_create_document();
+    int r = sedml_read_file("http://models.cellml.org/w/andre/sine/rawfile/293afb20feb51d1739b6645eaf2cd18b1a4f3bcb/sin_approximations_sedml.xml", NULL, doc);
+    if (!r)
+    {
+        std::cout << "r is zero!\n";
+        if (doc->sedml)
+        {
+            std::cout << "Found a SED-ML document with level: " << doc->sedml->level << "; version: "
+                      << doc->sedml->version << std::endl;
+        }
+        else
+        {
+            std::cout << "no sedml document?\n";
+        }
+    }
+    else
+    {
+        std::cout << "r is not zero! " << r << std::endl;
+    }
     /*std::cout << "Model Listing:\n";
     for (int i = 0; i < mModelList.size(); ++i)
     {
