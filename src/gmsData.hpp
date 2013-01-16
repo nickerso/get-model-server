@@ -2,6 +2,7 @@
 #define GMSDATA_HPP
 
 #include <vector>
+#include <map>
 
 class Workspace;
 
@@ -16,11 +17,20 @@ namespace GMS
           * Initialise the database of all models we know about.
           */
         int initialiseModelDatabase(const std::string& repositoryRoot);
+
         int addWorkspace(Workspace* workspace);
+
+        /**
+          * Serialise the list of workspaces to JSON.
+          * FIXME: might want to have a different method/arg for a summary listing
+          *        versus a complete listing?
+          */
+        std::string serialiseWorkspaceListing() const;
+
     private:
         std::string mRepositoryRoot;
         std::vector<std::string> mModelList;
-        std::vector<Workspace*> mWorkspaces;
+        std::map<std::string, Workspace*> mWorkspaces;
     };
 }
 #endif // GMSDATA_HPP

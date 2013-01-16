@@ -30,9 +30,14 @@ namespace GMS
                 GMS::Data* data);
     private:
         void getInvalidResponse(std::string& response);
-        // these are the URL's that we support
+        std::string handleModelRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
+                                       GMS::Data* data);
+        std::string handleQueryRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
+                                       GMS::Data* data);
+        // these are the root URL's that we support
         static const char URL_MODEL[];
-        static const char URL_EXECUTE[];
+        static const char URL_SEARCH[];
+        static const char URL_QUERY[];
     };
 }
 #endif // GMSAPI_HPP
