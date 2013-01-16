@@ -2,6 +2,8 @@
 #include <vector>
 #include <algorithm>
 #include <sedml/reader.h>
+#include <json/json.h>
+#include <json/json-forwards.h>
 
 #include "gmsData.hpp"
 #include "workspace.hpp"
@@ -20,12 +22,30 @@ public:
     {
         std::string url = root + workspaceName;
         std::cout << "Loading workspace: \'" << url.c_str() << "\'\n";
-        Workspace* workspace = new Workspace(url);
+        Workspace* workspace = new Workspace(url, workspaceName);
         data->addWorkspace(workspace);
     }
 
     Data* data;
     const std::string& root;
+};
+
+class WorkspaceToJson
+{
+public:
+    WorkspaceToJson(Json::Value& json) : jsonRoot(json)
+    {
+
+    }
+    // used with for_each
+    void operator()(const Workspace* workspace)
+    {
+        Json::Value w;
+        w["id"] = workspace->getId();
+        w["url"] = workspace->getUrl();
+        jsonRoot["workspaces"].append(w);
+    }
+    Json::Value& jsonRoot;
 };
 
 Data::Data()
@@ -77,6 +97,22 @@ int Data::initialiseModelDatabase(const std::string &repositoryRoot)
 
 int Data::addWorkspace(Workspace *workspace)
 {
-    mWorkspaces.push_back(workspace);
+    mWorkspaces[workspace->getId()] = workspace;
     return 0;
+}
+
+std::string Data::serialiseWorkspaceListing() const
+{
+    std::string listing;
+    Json::Value root;
+    std::map<std::string, Workspace*>::const_iterator it;
+    for (it = mWorkspaces.begin(); it != mWorkspaces.end(); ++it)
+    {
+        Json::Value w;
+        w["id"] = it->second->getId();
+        w["url"] = it->second->getUrl();
+        root["workspaces"].append(w);
+    }
+    listing = Json::FastWriter().write(root);
+    return listing;
 }

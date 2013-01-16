@@ -24,16 +24,32 @@ API::~API()
 }
 
 const char API::URL_MODEL[] = "/model/";
-const char API::URL_EXECUTE[] = "/execute/";
+const char API::URL_QUERY[] = "/query/";
+const char API::URL_SEARCH[] = "/search/";
 
 std::string API::executeAPI(const std::string& url, const std::map<std::string, std::string>& argvals,
                             GMS::Data *data)
 {
     std::string response;
     std::cout << "executeAPI for URL: \"" << url.c_str() << "\"" << std::endl;
+    // check for a model-type URL (/model, /model/, /model/id, etc)
+    std::string urlTest = url.substr(0, strlen(URL_MODEL));
+    if (urlTest.find('/', 1) == std::string::npos) urlTest.push_back('/');
+    if (urlTest == URL_MODEL)
+    {
+        return handleModelRequest(url, argvals, data);
+    }
+    // else check for a search/query-type URL (/search?species=rat&membrane=basal, /query/?author=andre, etc.)
+    urlTest = url.substr(0, strlen(URL_SEARCH) > strlen(URL_QUERY) ? strlen(URL_SEARCH) : strlen(URL_QUERY));
+    if (urlTest.find('/', 1) == std::string::npos) urlTest.push_back('/');
+    if ((urlTest == URL_SEARCH) || (urlTest == URL_QUERY))
+    {
+        return handleQueryRequest(url, argvals, data);
+    }
+
+#if 0
     std::string modelUrl = url.substr(0, strlen(URL_MODEL));
     std::string executeUrl = url.substr(0, strlen(URL_EXECUTE));
-    // http://localhost/model, http://localhost/model/model_id, http://localhost/model/, http://localhost/model?q=bob all valid
     if ((modelUrl == "/model/" ) || (modelUrl == "/model"))
     {
         // request for all models
@@ -130,9 +146,39 @@ std::string API::executeAPI(const std::string& url, const std::map<std::string, 
     {
         getInvalidResponse(response);
     }
+#endif
+    // unhandled API method called
+    std::cerr << "Unhandled API method for GMS: " << url.c_str() << std::endl;
+    getInvalidResponse(response);
     return response;
 }
+
 void API::getInvalidResponse(std::string& response)
 {
     response = "Some error in your data ";
+}
+
+std::string API::handleModelRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
+                               GMS::Data* data)
+{
+    std::string response;
+    if ((url.length() <= strlen(URL_MODEL)) && argvals.empty())
+    {
+        // request for model listing
+        response = data->serialiseWorkspaceListing();
+    }
+    else
+    {
+        // unhandled model request
+        std::cerr << "Unable to handle model request: " << url.c_str() << std::endl;
+        getInvalidResponse(response);
+    }
+    return response;
+}
+
+std::string API::handleQueryRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
+                               GMS::Data* data)
+{
+    std::string response;
+    return response;
 }

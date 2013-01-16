@@ -169,7 +169,6 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
     struct MHD_Response *response;
     int ret;
     std::map<std::string, std::string> url_args;
-    GMS::API api;
     std::string respdata;
 
     // HTTP access control (CORS)
@@ -195,6 +194,7 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
         return send_bad_response(connection);
     }
 
+    GMS::API api;
     respdata = api.executeAPI(url, url_args, data);
 
     *ptr = 0; /* reset when done */
