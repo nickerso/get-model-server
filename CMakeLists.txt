@@ -15,6 +15,7 @@ ENDIF(WIN32)
 FIND_PACKAGE(LibMicroHttpd REQUIRED)
 FIND_PACKAGE(LibCSim REQUIRED)
 FIND_PACKAGE(LibCsedml REQUIRED)
+FIND_PACKAGE(LibXml2 REQUIRED QUIET)
 
 set(PLATFORM_LIBS "curl" "xml2")
 
@@ -25,6 +26,8 @@ else(WIN32)
     set(PLATFORM_LIBS ${PLATFORM_LIBS} "m")
 endif(WIN32)
 
+add_definitions(${LIBXML2_DEFINITIONS})
+
 # Global includes?
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/src
@@ -32,6 +35,7 @@ INCLUDE_DIRECTORIES(
   ${clibsedml_INCLUDE_DIRS}
   ${libcsim_INCLUDE_DIRS}
   ${libmicrohttpd_INCLUDE_DIRS}
+  ${LIBXML2_INCLUDE_DIR}
 )
 
 # Sources
@@ -41,6 +45,10 @@ SET(SRCS
   src/libhttpd-utils.cpp
   src/gmsApi.cpp
   src/gmsData.cpp
+  src/workspace.cpp
+  src/contentItem.cpp
+  src/xmlDoc.cpp
+  src/utils.cpp
 )
 
 set(EXECUTABLE_NAME "gms")
@@ -49,5 +57,6 @@ TARGET_LINK_LIBRARIES(${EXECUTABLE_NAME}
   ${libmicrohttpd_LIBRARIES}
   ${libcsim_LIBRARIES}
   ${clibsedml_LIBRARIES}
+  ${LIBXML2_LIBRARIES}
   ${PLATFORM_LIBS}
 )

@@ -3,6 +3,8 @@
 
 #include <vector>
 
+class Workspace;
+
 namespace GMS
 {
     class Data
@@ -14,11 +16,11 @@ namespace GMS
           * Initialise the database of all models we know about.
           */
         int initialiseModelDatabase(const std::string& repositoryRoot);
+        int addWorkspace(Workspace* workspace);
     private:
         std::string mRepositoryRoot;
         std::vector<std::string> mModelList;
-        // want a persistent connection to re-use
-        void* mCurl;
+        std::vector<Workspace*> mWorkspaces;
     };
 }
 #endif // GMSDATA_HPP
