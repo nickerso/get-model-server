@@ -52,10 +52,14 @@ std::string getUrlContent(const std::string &url)
     // check headers
     std::vector<std::string> headers;
     headers = splitString(headerData, '\n', headers);
-    if (headers[0].find("200") == std::string::npos)
+    if (headers.size() > 0)
     {
-        // HTTP 200 OK header response not seen so delete any returned data
-        data.clear();
+        // have some headers to check
+        if (headers[0].find("200") == std::string::npos)
+        {
+            // HTTP 200 OK header response not seen so delete any returned data
+            data.clear();
+        }
     }
     return data;
 }

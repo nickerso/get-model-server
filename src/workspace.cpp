@@ -32,7 +32,6 @@ Workspace::Workspace(const std::string &url, const std::string &id) : mUrl(url),
             std::cout << "Content item: " << i+1 << "\n";
             std::cout << "**  location: " << mContentItems[i]->getLocation().c_str() << "\n";
             std::cout << "**    format: " << mContentItems[i]->getFormat().c_str() << "\n";
-
         }
     }
     else

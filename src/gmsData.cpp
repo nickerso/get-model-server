@@ -8,6 +8,7 @@
 #include "gmsData.hpp"
 #include "workspace.hpp"
 #include "utils.hpp"
+#include "rdfgraph.hpp"
 
 using namespace GMS;
 
@@ -51,11 +52,13 @@ public:
 Data::Data()
 {
     std::cout << "Creating new GMS::Data for use in the GET model server." << std::endl;
+    mRdfGraph = new RdfGraph();
 }
 
 Data::~Data()
 {
     std::cout << "Destroying the GMS::Data from the GET model server." << std::endl;
+    if (mRdfGraph) delete mRdfGraph;
 }
 
 int Data::initialiseModelDatabase(const std::string &repositoryRoot)

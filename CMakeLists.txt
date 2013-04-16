@@ -13,6 +13,7 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 FIND_PACKAGE(LibMicroHttpd REQUIRED)
+FIND_PACKAGE(LibRDF REQUIRED)
 FIND_PACKAGE(LibCSim REQUIRED)
 FIND_PACKAGE(LibCsedml REQUIRED)
 FIND_PACKAGE(LibXml2 REQUIRED QUIET)
@@ -34,6 +35,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/jsoncpp
   ${clibsedml_INCLUDE_DIRS}
   ${libcsim_INCLUDE_DIRS}
+  ${librdf_INCLUDE_DIRS}
   ${libmicrohttpd_INCLUDE_DIRS}
   ${LIBXML2_INCLUDE_DIR}
 )
@@ -49,12 +51,14 @@ SET(SRCS
   src/contentItem.cpp
   src/xmlDoc.cpp
   src/utils.cpp
+  src/rdfgraph.cpp
 )
 
 set(EXECUTABLE_NAME "gms")
 ADD_EXECUTABLE(${EXECUTABLE_NAME} ${SRCS})
 TARGET_LINK_LIBRARIES(${EXECUTABLE_NAME}
   ${libmicrohttpd_LIBRARIES}
+  ${librdf_LIBRARIES}
   ${libcsim_LIBRARIES}
   ${clibsedml_LIBRARIES}
   ${LIBXML2_LIBRARIES}
