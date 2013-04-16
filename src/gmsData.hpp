@@ -5,6 +5,7 @@
 #include <map>
 
 class Workspace;
+class RdfGraph;
 
 namespace GMS
 {
@@ -31,6 +32,7 @@ namespace GMS
         std::string mRepositoryRoot;
         std::vector<std::string> mModelList;
         std::map<std::string, Workspace*> mWorkspaces;
+        RdfGraph* mRdfGraph;
     };
 }
 #endif // GMSDATA_HPP

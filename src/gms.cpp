@@ -22,6 +22,7 @@ int main(int argc, char ** argv)
     if (0 == strcmp(argv[2], "GMS"))
 	{
         int code = data->initialiseModelDatabase("http://localhost:9876/models/");
+        //int code = data->initialiseModelDatabase("file:///Users/dnic019/shared-folders/projects/kidney/GeneralEpithelialTransport/www/models/");
         if (code != 0)
         {
             std::cerr << "Error initialising database\n";
