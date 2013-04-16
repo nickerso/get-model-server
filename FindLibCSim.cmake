@@ -13,13 +13,13 @@ include(LibFindMacros)
 # Include dir
 find_path(libcsim_INCLUDE_DIR
   NAMES CellmlSimulator.hpp
-  PATHS /tmp/csim-install/include
+  PATHS /Users/dnic019/shared-folders/resources/my-libs/CSim/mac-osx/include
 )
 
 # Finally the library itself
 find_library(libcsim_LIBRARY
   NAMES csim
-  PATHS /tmp/csim-install/lib
+  PATHS /Users/dnic019/shared-folders/resources/my-libs/CSim/mac-osx/lib
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
