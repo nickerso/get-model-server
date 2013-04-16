@@ -16,13 +16,13 @@ libfind_pkg_check_modules(clibsedml_PKGCONF clibsedml)
 # Include dir
 find_path(clibsedml_INCLUDE_DIR
   NAMES sedml/document.h
-  PATHS ${clibsedml_PKGCONF_INCLUDE_DIRS} /tmp/clibsedml/include
+  PATHS ${clibsedml_PKGCONF_INCLUDE_DIRS} /Users/dnic019/shared-folders/resources/my-libs/clibsedml/mac-osx/include
 )
 
 # Finally the library itself
 find_library(clibsedml_LIBRARY
   NAMES sedml
-  PATHS ${clibsedml_PKGCONF_LIBRARY_DIRS} /tmp/clibsedml/libs
+  PATHS ${clibsedml_PKGCONF_LIBRARY_DIRS} /Users/dnic019/shared-folders/resources/my-libs/clibsedml/mac-osx/libs
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
