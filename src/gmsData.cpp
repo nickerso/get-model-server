@@ -101,6 +101,8 @@ int Data::initialiseModelDatabase(const std::string &repositoryRoot)
 int Data::addWorkspace(Workspace *workspace)
 {
     mWorkspaces[workspace->getId()] = workspace;
+    // add any metadata from this workspace to our RDF graph
+    workspace->loadMetadata(this->mRdfGraph);
     return 0;
 }
 

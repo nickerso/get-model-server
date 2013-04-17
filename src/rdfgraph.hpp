@@ -1,8 +1,7 @@
 #ifndef RDFGRAPH_HPP
 #define RDFGRAPH_HPP
 
-struct librdf_world_s;
-typedef librdf_world_s librdf_world;
+class RedlandContainer;
 
 class RdfGraph
 {
@@ -10,8 +9,11 @@ public:
     RdfGraph();
     ~RdfGraph();
 
+    // parse the given RDF/XML URL into this graph
+    int parseRdfXmlUrl(const std::string& url);
+
 private:
-    librdf_world* mWorld;
+    RedlandContainer* mRedlandContainer;
 };
 
 #endif // RDFGRAPH_HPP

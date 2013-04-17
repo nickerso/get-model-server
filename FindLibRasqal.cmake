@@ -1,9 +1,9 @@
-# - Try to find librdf
+# - Try to find librasqal
 # Once done, this will define
 #
-#  librdf_FOUND - system has librdf
-#  librdf_INCLUDE_DIRS - the librdf include directories
-#  librdf_LIBRARIES - link these to use librdf
+#  librasqal_FOUND - system has librasqal
+#  librasqal_INCLUDE_DIRS - the librasqal include directories
+#  librasqal_LIBRARIES - link these to use librasqal
 
 include(LibFindMacros)
 
@@ -11,25 +11,25 @@ include(LibFindMacros)
 #libfind_package(Magick++ Magick)
 
 # Use pkg-config to get hints about paths
-libfind_pkg_check_modules(librdf_PKGCONF redland)
+libfind_pkg_check_modules(librasqal_PKGCONF rasqal)
 
 # Include dir
-find_path(librdf_INCLUDE_DIR
-  NAMES redland.h
-  PATHS ${librdf_PKGCONF_INCLUDE_DIRS}
+find_path(librasqal_INCLUDE_DIR
+  NAMES rasqal.h
+  PATHS ${librasqal_PKGCONF_INCLUDE_DIRS}
 )
 
 # Finally the library itself
-find_library(librdf_LIBRARY
-  NAMES rdf
-  HINTS ${librdf_PKGCONF_LIBRARY_DIRS}
+find_library(librasqal_LIBRARY
+  NAMES rasqal
+  HINTS ${librasqal_PKGCONF_LIBRARY_DIRS}
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
-set(librdf_PROCESS_INCLUDES librdf_INCLUDE_DIR)
-set(librdf_PROCESS_LIBS librdf_LIBRARY)
-libfind_process(librdf)
+set(librasqal_PROCESS_INCLUDES librasqal_INCLUDE_DIR)
+set(librasqal_PROCESS_LIBS librasqal_LIBRARY)
+libfind_process(librasqal)
 
 ## WHY doesn't the pkg-config pick this up!?!
 #set(librdf_INCLUDE_DIRS
@@ -39,5 +39,5 @@ libfind_process(librdf)
 
 #set(librdf_LIBRARIES -L/usr/local/Cellar/redland/1.0.15/lib -lrdf)
 
-message(STATUS "librdf_INCLUDE_DIRS = ${librdf_INCLUDE_DIRS}")
-message(STATUS "librdf_LIBRARIES = ${librdf_LIBRARIES}")
+#message(STATUS "librdf_INCLUDE_DIRS = ${librdf_INCLUDE_DIRS}")
+#message(STATUS "librdf_LIBRARIES = ${librdf_LIBRARIES}")

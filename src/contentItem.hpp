@@ -7,10 +7,10 @@ public:
     ContentItem();
     void setLocation(const std::string& location);
     void setLocation(const char* location);
-    const std::string& getLocation();
+    const std::string& getLocation() const;
     void setFormat(const std::string& format);
     void setFormat(const char* format);
-    const std::string& getFormat();
+    const std::string& getFormat() const;
 
 private:
     std::string mLocation;
