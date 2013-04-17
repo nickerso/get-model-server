@@ -10,6 +10,9 @@
 #include "utils.hpp"
 #include "rdfgraph.hpp"
 
+#define MODEL_TYPE_SMALL_MOLECULE "http://cellml.sourceforge.net/ns/model-type/small-molecule"
+#define MODEL_TYPE_CELL           "http://cellml.sourceforge.net/ns/model-type/cell"
+
 using namespace GMS;
 
 class WorkspaceLoader
@@ -117,6 +120,31 @@ std::string Data::serialiseWorkspaceListing() const
         w["id"] = it->second->getId();
         w["url"] = it->second->getUrl();
         root["workspaces"].append(w);
+    }
+    listing = Json::FastWriter().write(root);
+    return listing;
+}
+
+std::string Data::serialiseModelListing() const
+{
+    std::string listing;
+    Json::Value root;
+    std::vector<std::string> models = mRdfGraph->getModelsOfType(MODEL_TYPE_SMALL_MOLECULE);
+    std::vector<std::string>::const_iterator it;
+    for (it = models.begin(); it != models.end(); ++it)
+    {
+        Json::Value m;
+        m["uri"] = *it;
+        m["type"] = MODEL_TYPE_SMALL_MOLECULE;
+        root["models"].append(m);
+    }
+    models = mRdfGraph->getModelsOfType(MODEL_TYPE_CELL);
+    for (it = models.begin(); it != models.end(); ++it)
+    {
+        Json::Value m;
+        m["uri"] = *it;
+        m["type"] = MODEL_TYPE_CELL;
+        root["models"].append(m);
     }
     listing = Json::FastWriter().write(root);
     return listing;

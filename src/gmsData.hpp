@@ -28,6 +28,12 @@ namespace GMS
           */
         std::string serialiseWorkspaceListing() const;
 
+        /**
+          * Serialise the list of all models in the RDF graph for this data. This will serialise
+          * models for all the types that we know about.
+          */
+        std::string serialiseModelListing() const;
+
     private:
         std::string mRepositoryRoot;
         std::vector<std::string> mModelList;

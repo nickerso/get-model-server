@@ -12,6 +12,8 @@ public:
     // parse the given RDF/XML URL into this graph
     int parseRdfXmlUrl(const std::string& url);
 
+    std::vector<std::string> getModelsOfType(const std::string& typeUri);
+
 private:
     RedlandContainer* mRedlandContainer;
 };
