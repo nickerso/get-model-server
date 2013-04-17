@@ -165,7 +165,8 @@ std::string API::handleModelRequest(const std::string& url, const std::map<std::
     if ((url.length() <= strlen(URL_MODEL)) && argvals.empty())
     {
         // request for model listing
-        response = data->serialiseWorkspaceListing();
+        //response = data->serialiseWorkspaceListing();
+        response = data->serialiseModelListing();
     }
     else
     {

@@ -4,6 +4,7 @@
 #include <cstdarg>
 #include <cstdlib>
 #include <iostream>
+#include <vector>
 
 #include <redland.h>
 
@@ -62,4 +63,30 @@ int RdfGraph::parseRdfXmlUrl(const std::string &url)
     librdf_free_parser(parser);
     librdf_free_uri(uri);
     return 0;
+}
+
+
+std::vector<std::string> RdfGraph::getModelsOfType(const std::string& typeUri)
+{
+    std::vector<std::string> r;
+    std::string queryString = "select * where { ?s ";
+    queryString += "<http://biomodels.net/biology-qualifiers/property> <";
+    queryString += typeUri;
+    queryString += ">}";
+    librdf_query* query = librdf_new_query(mRedlandContainer->world, "sparql", NULL, (const unsigned char*)(queryString.c_str()), NULL);
+    librdf_query_results* results = librdf_model_query_execute(mRedlandContainer->model, query);
+    if (results && librdf_query_results_is_bindings(results))
+    {
+        while (!librdf_query_results_finished(results))
+        {
+            librdf_node* node = librdf_query_results_get_binding_value_by_name(results, "s");
+            librdf_uri* uri = librdf_node_get_uri(node);
+            librdf_free_node(node);
+            r.push_back(std::string((char*)(librdf_uri_as_string(uri))));
+            librdf_query_results_next(results);
+        }
+    }
+    librdf_free_query_results(results);
+    librdf_free_query(query);
+    return r;
 }
