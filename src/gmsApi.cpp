@@ -23,7 +23,7 @@ API::~API()
     std::cout << "Destroying a GMS::API object from the GET model server" << std::endl;
 }
 
-const char API::URL_MODEL[] = "/model/";
+const char API::URL_MODEL[] = "/models/";
 const char API::URL_QUERY[] = "/query/";
 const char API::URL_SEARCH[] = "/search/";
 
