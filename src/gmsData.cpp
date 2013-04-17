@@ -131,12 +131,14 @@ std::string Data::serialiseModelListing() const
     Json::Value root;
     std::vector<std::string> models = mRdfGraph->getModelsOfType(MODEL_TYPE_SMALL_MOLECULE);
     std::vector<std::string>::const_iterator it;
+    Json::Value t;
     for (it = models.begin(); it != models.end(); ++it)
     {
         Json::Value m;
         m["uri"] = *it;
         m["type"] = MODEL_TYPE_SMALL_MOLECULE;
-        root["models"].append(m);
+        t["small-molecule"].append(m);
+        //root["models"].append(m);
     }
     models = mRdfGraph->getModelsOfType(MODEL_TYPE_CELL);
     for (it = models.begin(); it != models.end(); ++it)
@@ -144,8 +146,10 @@ std::string Data::serialiseModelListing() const
         Json::Value m;
         m["uri"] = *it;
         m["type"] = MODEL_TYPE_CELL;
-        root["models"].append(m);
+        t["cell"].append(m);
+        //root["models"].append(m);
     }
+    root["models"].append(t);
     listing = Json::FastWriter().write(root);
     return listing;
 }
