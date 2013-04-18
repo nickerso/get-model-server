@@ -58,6 +58,7 @@ SET(SRCS
   src/xmlDoc.cpp
   src/utils.cpp
   src/rdfgraph.cpp
+  src/dojotest.cpp
 )
 
 set(EXECUTABLE_NAME "gms")

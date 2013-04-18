@@ -10,6 +10,7 @@
 
 #include "gmsApi.hpp"
 #include "gmsData.hpp"
+#include "dojotest.hpp"
 
 using namespace GMS;
 
@@ -23,15 +24,24 @@ API::~API()
     std::cout << "Destroying a GMS::API object from the GET model server" << std::endl;
 }
 
-const char API::URL_MODEL[] = "/models/";
-const char API::URL_QUERY[] = "/query/";
-const char API::URL_SEARCH[] = "/search/";
+const char API::URL_MODEL[] = "/models";
+const char API::URL_QUERY[] = "/query";
+const char API::URL_SEARCH[] = "/search";
+const char API::URL_DOJO_TEST[] = "/dojo-test";
 
 std::string API::executeAPI(const std::string& url, const std::map<std::string, std::string>& argvals,
                             GMS::Data *data)
 {
     std::string response;
     std::cout << "executeAPI for URL: \"" << url.c_str() << "\"" << std::endl;
+
+    // test data from Dojo examples
+    std::string dojoBase = url.substr(0, strlen(URL_DOJO_TEST));
+    if (dojoBase == URL_DOJO_TEST)
+    {
+        return handleDojoTestRequest(url, argvals);
+    }
+
     // check for a model-type URL (/model, /model/, /model/id, etc)
     std::string urlTest = url.substr(0, strlen(URL_MODEL));
     if (urlTest.find('/', 1) == std::string::npos) urlTest.push_back('/');
@@ -39,6 +49,7 @@ std::string API::executeAPI(const std::string& url, const std::map<std::string, 
     {
         return handleModelRequest(url, argvals, data);
     }
+    // FIXME: will this just be done as queries on the model URL?
     // else check for a search/query-type URL (/search?species=rat&membrane=basal, /query/?author=andre, etc.)
     urlTest = url.substr(0, strlen(URL_SEARCH) > strlen(URL_QUERY) ? strlen(URL_SEARCH) : strlen(URL_QUERY));
     if (urlTest.find('/', 1) == std::string::npos) urlTest.push_back('/');
@@ -174,6 +185,14 @@ std::string API::handleModelRequest(const std::string& url, const std::map<std::
         std::cerr << "Unable to handle model request: " << url.c_str() << std::endl;
         getInvalidResponse(response);
     }
+    return response;
+}
+
+std::string API::handleDojoTestRequest(const std::string &url, const std::map<std::string, std::string>& argvals)
+{
+    std::string response;
+    DojoTest dojo;
+    response = dojo.handleRequest(url, argvals);
     return response;
 }
 

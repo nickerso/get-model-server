@@ -34,10 +34,13 @@ namespace GMS
                                        GMS::Data* data);
         std::string handleQueryRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
                                        GMS::Data* data);
+        std::string handleDojoTestRequest(const std::string& url, const std::map<std::string, std::string>& argvals);
+
         // these are the root URL's that we support
         static const char URL_MODEL[];
         static const char URL_SEARCH[];
         static const char URL_QUERY[];
+        static const char URL_DOJO_TEST[]; // provides some test JSON data from Dojo examples
     };
 }
 #endif // GMSAPI_HPP
