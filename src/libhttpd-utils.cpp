@@ -191,13 +191,18 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
     if (MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND,
             get_url_args, &url_args) < 0)
     {
-        return send_bad_response(connection);
+        return MHD_NO;
     }
 
     GMS::API api;
     respdata = api.executeAPI(url, url_args, data);
 
     *ptr = 0; /* reset when done */
+
+    if (respdata == "BAD RESPONSE")
+    {
+        return send_bad_response(connection);
+    }
     //val = MHD_lookup_connection_value (connection, MHD_GET_ARGUMENT_KIND, "q");
     me = (char *) malloc(respdata.size() + 1);
     if (me == 0)
