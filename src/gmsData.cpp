@@ -129,6 +129,9 @@ std::string Data::serialiseModelListing() const
 {
     std::string listing;
     Json::Value root;
+    root["id"] = "root";
+    root["type"] = "root";
+    root["name"] = "Model Listing";
     std::vector<std::string> models = mRdfGraph->getModelsOfType(MODEL_TYPE_SMALL_MOLECULE);
     std::vector<std::string>::const_iterator it;
     for (it = models.begin(); it != models.end(); ++it)
@@ -145,6 +148,51 @@ std::string Data::serialiseModelListing() const
         m["uri"] = *it;
         m["type"] = MODEL_TYPE_CELL;
         root["models"].append(m);
+    }
+    listing = Json::FastWriter().write(root);
+    return listing;
+}
+
+std::string Data::serialiseModel(const std::string& modelID) const
+{
+    std::cout << "serialising model: " << modelID.c_str() << std::endl;
+    std::string listing;
+    Json::Value root;
+    if (modelID == "/root")
+    {
+        root["id"] = "root";
+        root["name"] = "Model Listing";
+        root["hasChildren"] = true;
+        Json::Value c;
+        c["id"] = "MODEL_TYPE_SMALL_MOLECULE";
+        c["name"] = "small molecules";
+        std::vector<std::string> models = mRdfGraph->getModelsOfType(MODEL_TYPE_SMALL_MOLECULE);
+        if (models.size() > 0) c["hasChildren"] = true;
+        root["children"].append(c);
+        c["id"] = "MODEL_TYPE_CELL";
+        c["name"] = "whole cell";
+        models = mRdfGraph->getModelsOfType(MODEL_TYPE_CELL);
+        if (models.size() > 0) c["hasChildren"] = true;
+        root["children"].append(c);
+    }
+    else
+    {
+        std::string modelType = "";
+        if (modelID == "/MODEL_TYPE_SMALL_MOLECULE") modelType = MODEL_TYPE_SMALL_MOLECULE;
+        else if (modelID == "/MODEL_TYPE_CELL") modelType = MODEL_TYPE_CELL;
+        if (modelType != "")
+        {
+            std::vector<std::string> models = mRdfGraph->getModelsOfType(modelType);
+            std::vector<std::string>::const_iterator it;
+            for (it = models.begin(); it != models.end(); ++it)
+            {
+                Json::Value m;
+                m["uri"] = *it;
+                m["type"] = MODEL_TYPE_SMALL_MOLECULE;
+                m["hasChildren"] = false;
+                root["children"].append(m);
+            }
+        }
     }
     listing = Json::FastWriter().write(root);
     return listing;

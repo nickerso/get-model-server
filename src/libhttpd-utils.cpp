@@ -125,9 +125,9 @@ static int sendAccessControl(struct MHD_Connection *connection, const char *url,
     }
     // not too fussed with who is trying to use us :)
     MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
-    // only allow GET (and OPTIONS) requests, no need for PUSH yet...
+    // only allow GET (and OPTIONS) requests, no need for PUSH yet...now there is a need for push
     MHD_add_response_header(response, "Access-Control-Allow-Methods",
-            "GET, OPTIONS");
+                            "GET, OPTIONS, PUT");
     // we simply 'allow' all requested headers
     const char* val = MHD_lookup_connection_value(connection, MHD_HEADER_KIND,
             "Access-Control-Request-Headers");
@@ -144,6 +144,7 @@ static int sendAccessControl(struct MHD_Connection *connection, const char *url,
 static int get_url_args(void *cls, MHD_ValueKind kind, const char *key,
         const char* value)
 {
+    std::cout << "Get Arg with key: '" << key << "'" << std::endl;
     std::map<std::string, std::string> * url_args = static_cast<std::map<std::string, std::string> *>(cls);
     if (url_args->find(key) == url_args->end())
     {

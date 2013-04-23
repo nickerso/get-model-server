@@ -44,8 +44,7 @@ std::string API::executeAPI(const std::string& url, const std::map<std::string, 
 
     // check for a model-type URL (/model, /model/, /model/id, etc)
     std::string urlTest = url.substr(0, strlen(URL_MODEL));
-    if (urlTest.find('/', 1) == std::string::npos) urlTest.push_back('/');
-    if (urlTest == URL_MODEL)
+    if (urlTest.find(URL_MODEL) != std::string::npos)
     {
         return handleModelRequest(url, argvals, data);
     }
@@ -172,17 +171,31 @@ void API::getInvalidResponse(std::string& response)
 std::string API::handleModelRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
                                GMS::Data* data)
 {
+    std::cout << "handleModelRequest: " << url.c_str() << std::endl;
     std::string response;
     if ((url.length() <= strlen(URL_MODEL)) && argvals.empty())
     {
-        // request for model listing
-        //response = data->serialiseWorkspaceListing();
-        response = data->serialiseModelListing();
+        std::cerr << "missing model ID? url: " << url.c_str() << std::endl;
+        getInvalidResponse(response);
+    }
+    if (argvals.empty())
+    {
+        std::string modelID = url.substr(strlen(URL_MODEL));
+        if (modelID.size() > 0)
+        {
+            // request for model listing
+            //response = data->serialiseWorkspaceListing();
+            response = data->serialiseModel(modelID);
+        }
+        else
+        {
+            std::cerr << "Model ID is empty? " << std::endl;
+        }
     }
     else
     {
         // unhandled model request
-        std::cerr << "Unable to handle model request: " << url.c_str() << std::endl;
+        std::cerr << "Unable to handle model request with args: " << url.c_str() << std::endl;
         getInvalidResponse(response);
     }
     return response;
