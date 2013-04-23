@@ -34,6 +34,11 @@ namespace GMS
           */
         std::string serialiseModelListing() const;
 
+        /**
+          * Serialise the requested model ID.
+          */
+        std::string serialiseModel(const std::string& modelID) const;
+
     private:
         std::string mRepositoryRoot;
         std::vector<std::string> mModelList;
