@@ -180,8 +180,9 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
         return sendAccessControl(connection, url, method, version);
 
     // we only need to deal with GET requests
+    /*  FIXME -- don't need this since the HTTP options/preflight will ensure non-supported methods are rejected?
     if (0 != strcmp(method, MHD_HTTP_METHOD_GET))
-        return MHD_NO;
+        return MHD_NO;*/
 
     if (&aptr != *ptr)
     {
