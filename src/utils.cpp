@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <libxml/uri.h>
 
 #include "utils.hpp"
 
@@ -75,3 +76,13 @@ std::vector<std::string>& splitString(const std::string &s, char delim, std::vec
     return elems;
 }
 
+std::string urlChildOf(const std::string& url, const std::string& base)
+{
+    std::string result;
+    size_t found = url.find(base);
+    if (found == 0)
+    {
+        result = url.substr(base.size());
+    }
+    return result;
+}

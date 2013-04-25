@@ -11,6 +11,7 @@
 #include "gmsApi.hpp"
 #include "gmsData.hpp"
 #include "dojotest.hpp"
+#include "utils.hpp"
 
 using namespace GMS;
 
@@ -36,21 +37,21 @@ std::string API::executeAPI(const std::string& url, const std::map<std::string, 
     std::cout << "executeAPI for URL: \"" << url.c_str() << "\"" << std::endl;
 
     // test data from Dojo examples
-    std::string dojoBase = url.substr(0, strlen(URL_DOJO_TEST));
-    if (dojoBase == URL_DOJO_TEST)
+    std::string child = urlChildOf(url, URL_DOJO_TEST);
+    if (child.size() > 0)
     {
         return handleDojoTestRequest(url, argvals);
     }
 
     // check for a model-type URL (/model, /model/, /model/id, etc)
-    std::string urlTest = url.substr(0, strlen(URL_MODEL));
-    if (urlTest.find(URL_MODEL) != std::string::npos)
+    child = urlChildOf(url, URL_MODEL);
+    if (child.size() > 0)
     {
         return handleModelRequest(url, argvals, data);
     }
     // FIXME: will this just be done as queries on the model URL?
     // else check for a search/query-type URL (/search?species=rat&membrane=basal, /query/?author=andre, etc.)
-    urlTest = url.substr(0, strlen(URL_SEARCH) > strlen(URL_QUERY) ? strlen(URL_SEARCH) : strlen(URL_QUERY));
+    std::string urlTest = url.substr(0, strlen(URL_SEARCH) > strlen(URL_QUERY) ? strlen(URL_SEARCH) : strlen(URL_QUERY));
     if (urlTest.find('/', 1) == std::string::npos) urlTest.push_back('/');
     if ((urlTest == URL_SEARCH) || (urlTest == URL_QUERY))
     {
@@ -173,24 +174,17 @@ std::string API::handleModelRequest(const std::string& url, const std::map<std::
 {
     std::cout << "handleModelRequest: " << url.c_str() << std::endl;
     std::string response;
-    if ((url.length() <= strlen(URL_MODEL)) && argvals.empty())
+    std::string modelID = urlChildOf(url, URL_MODEL);
+    if ((modelID.size() > 0) && argvals.empty())
     {
         std::cerr << "missing model ID? url: " << url.c_str() << std::endl;
         getInvalidResponse(response);
     }
     if (argvals.empty())
     {
-        std::string modelID = url.substr(strlen(URL_MODEL));
-        if (modelID.size() > 0)
-        {
-            // request for model listing
-            //response = data->serialiseWorkspaceListing();
-            response = data->serialiseModel(modelID);
-        }
-        else
-        {
-            std::cerr << "Model ID is empty? " << std::endl;
-        }
+        // request for model listing
+        //response = data->serialiseWorkspaceListing();
+        response = data->serialiseModel(modelID);
     }
     else
     {
