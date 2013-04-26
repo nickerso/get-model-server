@@ -12,6 +12,16 @@
 
 static const int OutputRdfGraph = 0;
 
+static void printNodeType(librdf_node* node)
+{
+    std::cout << "Given node is of type: ";
+    if (librdf_node_is_resource(node)) std::cout << "rdf:Resource (& rdf:Property) - has a URI";
+    else if (librdf_node_is_literal(node)) std::cout << "rdf:Literal - has an XML string, language, XML space";
+    else if (librdf_node_is_blank(node)) std::cout << "blank node has an identifier string";
+    else std::cout << "???UNKNOWN TYPE???";
+    std::cout << std::endl;
+}
+
 // we use the redland container object to hide all the Redland code from the outside world.
 class RedlandContainer
 {
@@ -73,12 +83,14 @@ std::vector<std::string> RdfGraph::getModelsOfType(const std::string& typeUri)
     queryString += "<http://biomodels.net/biology-qualifiers/property> <";
     queryString += typeUri;
     queryString += ">}";
+    std::cout << "query string: " << queryString.c_str() << std::endl;
     librdf_query* query = librdf_new_query(mRedlandContainer->world, "sparql", NULL, (const unsigned char*)(queryString.c_str()), NULL);
     librdf_query_results* results = librdf_model_query_execute(mRedlandContainer->model, query);
     if (results && librdf_query_results_is_bindings(results))
     {
         while (!librdf_query_results_finished(results))
         {
+            std::cout << "bobby!" << std::endl;
             librdf_node* node = librdf_query_results_get_binding_value_by_name(results, "s");
             librdf_uri* uri = librdf_node_get_uri(node);
             librdf_free_node(node);
@@ -89,4 +101,30 @@ std::vector<std::string> RdfGraph::getModelsOfType(const std::string& typeUri)
     librdf_free_query_results(results);
     librdf_free_query(query);
     return r;
+}
+
+std::string RdfGraph::getResourceTitle(const std::string &uri)
+{
+    std::string title = "untitled";
+    std::string queryString = "select * where { <";
+    queryString += uri;
+    queryString += "> <http://purl.org/dc/terms/title> ?t }";
+    std::cout << "query string: " << queryString.c_str() << std::endl;
+    librdf_query* query = librdf_new_query(mRedlandContainer->world, "sparql", NULL, (const unsigned char*)(queryString.c_str()), NULL);
+    librdf_query_results* results = librdf_model_query_execute(mRedlandContainer->model, query);
+    if (results && librdf_query_results_is_bindings(results))
+    {
+        // protection from there being no results.
+        if (!librdf_query_results_finished(results))
+        {
+            librdf_node* node = librdf_query_results_get_binding_value_by_name(results, "t");
+            if (0) printNodeType(node);
+            char* s = librdf_node_get_literal_value_as_latin1(node);
+            librdf_free_node(node);
+            title = std::string(s);
+        }
+    }
+    librdf_free_query_results(results);
+    librdf_free_query(query);
+    return title;
 }

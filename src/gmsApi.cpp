@@ -175,12 +175,12 @@ std::string API::handleModelRequest(const std::string& url, const std::map<std::
     std::cout << "handleModelRequest: " << url.c_str() << std::endl;
     std::string response;
     std::string modelID = urlChildOf(url, URL_MODEL);
-    if ((modelID.size() > 0) && argvals.empty())
+    if (modelID.size() == 0)
     {
         std::cerr << "missing model ID? url: " << url.c_str() << std::endl;
         getInvalidResponse(response);
     }
-    if (argvals.empty())
+    else if (argvals.empty())
     {
         // request for model listing
         //response = data->serialiseWorkspaceListing();
