@@ -175,7 +175,7 @@ std::string Data::serialiseModel(const std::string& modelID) const
         if (models.size() > 0) c["hasChildren"] = true;
         root["children"].append(c);
     }
-    else
+    else if (modelID.find("/MODEL_TYPE_") == 0)
     {
         std::string modelType = "";
         if (modelID == "/MODEL_TYPE_SMALL_MOLECULE") modelType = MODEL_TYPE_SMALL_MOLECULE;
@@ -186,13 +186,20 @@ std::string Data::serialiseModel(const std::string& modelID) const
             std::vector<std::string>::const_iterator it;
             for (it = models.begin(); it != models.end(); ++it)
             {
+                std::string s = mRdfGraph->getResourceTitle(*it);
                 Json::Value m;
                 m["uri"] = *it;
+                m["id"] = *it;
+                m["name"] = s;
                 m["type"] = MODEL_TYPE_SMALL_MOLECULE;
                 m["hasChildren"] = false;
                 root["children"].append(m);
             }
         }
+    }
+    else
+    {
+        std::cout << "\n\nGetting model: " << modelID.c_str() << std::endl;
     }
     listing = Json::FastWriter().write(root);
     return listing;
