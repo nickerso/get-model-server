@@ -12,6 +12,7 @@
 
 #define MODEL_TYPE_SMALL_MOLECULE "http://cellml.sourceforge.net/ns/model-type/small-molecule"
 #define MODEL_TYPE_CELL           "http://cellml.sourceforge.net/ns/model-type/cell"
+#define MODEL_TYPE_TRANSPORTER    "http://cellml.sourceforge.net/ns/model-type/transport-protein"
 
 using namespace GMS;
 
@@ -141,6 +142,14 @@ std::string Data::serialiseModelListing() const
         m["type"] = MODEL_TYPE_SMALL_MOLECULE;
         root["models"].append(m);
     }
+    models = mRdfGraph->getModelsOfType(MODEL_TYPE_TRANSPORTER);
+    for (it = models.begin(); it != models.end(); ++it)
+    {
+        Json::Value m;
+        m["uri"] = *it;
+        m["type"] = MODEL_TYPE_TRANSPORTER;
+        root["models"].append(m);
+    }
     models = mRdfGraph->getModelsOfType(MODEL_TYPE_CELL);
     for (it = models.begin(); it != models.end(); ++it)
     {
@@ -169,6 +178,11 @@ std::string Data::serialiseModel(const std::string& modelID) const
         std::vector<std::string> models = mRdfGraph->getModelsOfType(MODEL_TYPE_SMALL_MOLECULE);
         if (models.size() > 0) c["hasChildren"] = true;
         root["children"].append(c);
+        c["id"] = "MODEL_TYPE_TRANSPORTER";
+        c["name"] = "transporters";
+        models = mRdfGraph->getModelsOfType(MODEL_TYPE_TRANSPORTER);
+        if (models.size() > 0) c["hasChildren"] = true;
+        root["children"].append(c);
         c["id"] = "MODEL_TYPE_CELL";
         c["name"] = "whole cell";
         models = mRdfGraph->getModelsOfType(MODEL_TYPE_CELL);
@@ -179,6 +193,7 @@ std::string Data::serialiseModel(const std::string& modelID) const
     {
         std::string modelType = "";
         if (modelID == "/MODEL_TYPE_SMALL_MOLECULE") modelType = MODEL_TYPE_SMALL_MOLECULE;
+        else if (modelID == "/MODEL_TYPE_TRANSPORTER") modelType = MODEL_TYPE_TRANSPORTER;
         else if (modelID == "/MODEL_TYPE_CELL") modelType = MODEL_TYPE_CELL;
         if (modelType != "")
         {
@@ -191,7 +206,7 @@ std::string Data::serialiseModel(const std::string& modelID) const
                 m["uri"] = *it;
                 m["id"] = *it;
                 m["name"] = s;
-                m["type"] = MODEL_TYPE_SMALL_MOLECULE;
+                m["type"] = modelType;
                 m["hasChildren"] = false;
                 root["children"].append(m);
             }
