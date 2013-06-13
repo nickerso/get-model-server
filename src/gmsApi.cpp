@@ -45,7 +45,7 @@ std::string API::executeAPI(const std::string& url, const std::map<std::string, 
 
     // check for a model-type URL (/model, /model/, /model/id, etc)
     child = urlChildOf(url, URL_MODEL);
-    if (child.size() > 0)
+    if ((child.size() > 0) || (url == URL_MODEL))
     {
         return handleModelRequest(url, argvals, data);
     }
@@ -175,16 +175,21 @@ std::string API::handleModelRequest(const std::string& url, const std::map<std::
     std::cout << "handleModelRequest: " << url.c_str() << std::endl;
     std::string response;
     std::string modelID = urlChildOf(url, URL_MODEL);
-    if (modelID.size() == 0)
-    {
-        std::cerr << "missing model ID? url: " << url.c_str() << std::endl;
-        getInvalidResponse(response);
-    }
-    else if (argvals.empty())
+    if ((modelID.size() != 0) && argvals.empty())
     {
         // request for model listing
         //response = data->serialiseWorkspaceListing();
         response = data->serialiseModel(modelID);
+    }
+    else if (!argvals.empty())
+    {
+        /*for(auto iter=argvals.begin(); iter!=argvals.end(); ++iter)
+        {
+            std::cout << "args:: key(" << iter->first << ") -> value(" << iter->second << ")" << std::endl;
+        }*/
+        // FIXME: type is the only argument we currently handle.
+        if (argvals.count("type")) response = data->serialiseModelsOfType(argvals.at("type"));
+        else getInvalidResponse(response);
     }
     else
     {

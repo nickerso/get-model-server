@@ -219,3 +219,24 @@ std::string Data::serialiseModel(const std::string& modelID) const
     listing = Json::FastWriter().write(root);
     return listing;
 }
+
+std::string Data::serialiseModelsOfType(const std::string& modelType) const
+{
+    std::cout << "serialising models of type: " << modelType.c_str() << std::endl;
+    std::string listing;
+    Json::Value root;
+    std::vector<std::string> models = mRdfGraph->getModelsOfType(modelType);
+    for (auto it = models.begin(); it != models.end(); ++it)
+    {
+        std::string s = mRdfGraph->getResourceTitle(*it);
+        Json::Value m;
+        m["uri"] = *it;
+        m["id"] = *it;
+        m["name"] = s;
+        m["type"] = modelType;
+        m["hasChildren"] = false;
+        root["children"].append(m);
+    }
+    listing = Json::FastWriter().write(root);
+    return listing;
+}

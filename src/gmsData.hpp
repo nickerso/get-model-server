@@ -39,6 +39,11 @@ namespace GMS
           */
         std::string serialiseModel(const std::string& modelID) const;
 
+        /**
+          * Serialise all models of the given type.
+          */
+        std::string serialiseModelsOfType(const std::string& modelType) const;
+
     private:
         std::string mRepositoryRoot;
         std::vector<std::string> mModelList;
