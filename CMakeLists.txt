@@ -27,7 +27,7 @@ set(PLATFORM_LIBS "curl" "xml2")
 # Set compiler flags
 if (WIN32)
 else(WIN32)
-    add_definitions(-Wall -Werror)
+    add_definitions("-std=c++11" "-Wall" "-Werror")
     set(PLATFORM_LIBS ${PLATFORM_LIBS} "m")
 endif(WIN32)
 
