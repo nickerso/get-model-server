@@ -35,19 +35,36 @@ namespace GMS
         std::string serialiseModelListing() const;
 
         /**
-          * Serialise the requested model ID.
+          * Serialise the requested model ID. DEPRECATED
           */
-        std::string serialiseModel(const std::string& modelID) const;
+        std::string serialiseModel(const std::string& id);
+
+        /**
+          * Perform the specified action on the given model.
+          */
+        std::string performModelAction(const std::string& modelId, const std::string& action);
 
         /**
           * Serialise all models of the given type.
           */
-        std::string serialiseModelsOfType(const std::string& modelType) const;
+        std::string serialiseModelsOfType(const std::string& modelType);
+
+        /**
+          * Returns the model ID for the model with the specified URI.
+          */
+        std::string& mapModelUri(const std::string& uri);
+
+        /**
+          * Returns the model URI for the given model ID. Empty string if given ID is not found.
+          */
+        std::string mapModelId(const std::string& id);
 
     private:
         std::string mRepositoryRoot;
         std::vector<std::string> mModelList;
         std::map<std::string, Workspace*> mWorkspaces;
+        std::map<std::string, std::string> mModelIdMap; // ID -> URI map
+        std::map<std::string, std::string> mModelUriMap; // URI -> ID map
         RdfGraph* mRdfGraph;
     };
 }

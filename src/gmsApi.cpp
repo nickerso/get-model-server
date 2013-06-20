@@ -174,19 +174,32 @@ std::string API::handleModelRequest(const std::string& url, const std::map<std::
 {
     std::cout << "handleModelRequest: " << url.c_str() << std::endl;
     std::string response;
-    std::string modelID = urlChildOf(url, URL_MODEL);
-    if ((modelID.size() != 0) && argvals.empty())
+    std::string trailer = urlChildOf(url, URL_MODEL);
+    std::cout << "argvals: ";
+    for(auto iter=argvals.begin(); iter!=argvals.end(); ++iter)
     {
-        // request for model listing
-        //response = data->serialiseWorkspaceListing();
-        response = data->serialiseModel(modelID);
+        std::cout << "args:: key(" << iter->first << ") -> value(" << iter->second << ")" << std::endl;
+    }
+    if ((trailer.size() != 0) && argvals.empty())
+    {
+        // request for information about a specific model
+        std::vector<std::string> strings;
+        strings = splitString(trailer, '/', strings);
+        if (strings.size() == 2)
+        {
+            std::string modelId = strings[0];
+            std::string action = strings[1];
+            //response = data->serialiseWorkspaceListing();
+            response = data->performModelAction(modelId, action);
+        }
+        else
+        {
+            std::cerr << "expecting model ID with exactly one action to perform: " << url.c_str() << std::endl;
+            getInvalidResponse(response);
+        }
     }
     else if (!argvals.empty())
     {
-        /*for(auto iter=argvals.begin(); iter!=argvals.end(); ++iter)
-        {
-            std::cout << "args:: key(" << iter->first << ") -> value(" << iter->second << ")" << std::endl;
-        }*/
         // FIXME: type is the only argument we currently handle.
         if (argvals.count("type")) response = data->serialiseModelsOfType(argvals.at("type"));
         else getInvalidResponse(response);

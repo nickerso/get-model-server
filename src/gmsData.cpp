@@ -1,3 +1,4 @@
+#include <sstream>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -162,65 +163,48 @@ std::string Data::serialiseModelListing() const
     return listing;
 }
 
-std::string Data::serialiseModel(const std::string& modelID) const
+std::string Data::serialiseModel(const std::string& id)
 {
-    std::cout << "serialising model: " << modelID.c_str() << std::endl;
-    std::string listing;
+    std::string modelURI = mapModelId(id);
+    std::cout << "serialising model: " << modelURI.c_str() << std::endl;
     Json::Value root;
-    if (modelID == "/root")
-    {
-        root["id"] = "root";
-        root["name"] = "Model Listing";
-        root["hasChildren"] = true;
-        Json::Value c;
-        c["id"] = "MODEL_TYPE_SMALL_MOLECULE";
-        c["name"] = "small molecules";
-        std::vector<std::string> models = mRdfGraph->getModelsOfType(MODEL_TYPE_SMALL_MOLECULE);
-        if (models.size() > 0) c["hasChildren"] = true;
-        root["children"].append(c);
-        c["id"] = "MODEL_TYPE_TRANSPORTER";
-        c["name"] = "transporters";
-        models = mRdfGraph->getModelsOfType(MODEL_TYPE_TRANSPORTER);
-        if (models.size() > 0) c["hasChildren"] = true;
-        root["children"].append(c);
-        c["id"] = "MODEL_TYPE_CELL";
-        c["name"] = "whole cell";
-        models = mRdfGraph->getModelsOfType(MODEL_TYPE_CELL);
-        if (models.size() > 0) c["hasChildren"] = true;
-        root["children"].append(c);
-    }
-    else if (modelID.find("/MODEL_TYPE_") == 0)
-    {
-        std::string modelType = "";
-        if (modelID == "/MODEL_TYPE_SMALL_MOLECULE") modelType = MODEL_TYPE_SMALL_MOLECULE;
-        else if (modelID == "/MODEL_TYPE_TRANSPORTER") modelType = MODEL_TYPE_TRANSPORTER;
-        else if (modelID == "/MODEL_TYPE_CELL") modelType = MODEL_TYPE_CELL;
-        if (modelType != "")
+    root["id"] = id;
+    std::string s = mRdfGraph->getResourceTitle(modelURI);
+    root["name"] = s;
+    std::string listing = Json::FastWriter().write(root);
+    return listing;
+}
+
+std::string Data::performModelAction(const std::string &modelId, const std::string &action)
+{
+    std::string modelURI = mapModelId(modelId);
+    if (modelURI == "") return "";
+    std::cout << "performing action: '" << action.c_str() << "' on model: " << modelURI.c_str() << std::endl;
+    Json::Value root;
+    if (action == "title") root["title"] = mRdfGraph->getResourceTitle(modelURI);
+    else if (action == "image") {
+        std::string imageUri = mRdfGraph->getResourceImageUrl(modelURI);
+        if (imageUri != "")
         {
-            std::vector<std::string> models = mRdfGraph->getModelsOfType(modelType);
-            std::vector<std::string>::const_iterator it;
-            for (it = models.begin(); it != models.end(); ++it)
+            std::string jsonString = getUrlContent(imageUri);
+            Json::Reader reader;
+            bool parsingSuccessful = reader.parse(jsonString, root, /*discard comments*/false);
+            if (!parsingSuccessful)
             {
-                std::string s = mRdfGraph->getResourceTitle(*it);
-                Json::Value m;
-                m["uri"] = *it;
-                m["id"] = *it;
-                m["name"] = s;
-                m["type"] = modelType;
-                m["hasChildren"] = false;
-                root["children"].append(m);
+                std::cout  << "Failed to parse iamge file: " << imageUri.c_str() << "\n"
+                           << reader.getFormattedErrorMessages();
             }
         }
     }
     else
     {
-        std::cout << "\n\nGetting model: " << modelID.c_str() << std::endl;
+        std::cout << "Unknown action to perform: " << action.c_str() << std::endl;
     }
-    listing = Json::FastWriter().write(root);
+    std::string listing = Json::FastWriter().write(root);
     return listing;
 }
 
-std::string Data::serialiseModelsOfType(const std::string& modelType) const
+std::string Data::serialiseModelsOfType(const std::string& modelType)
 {
     std::cout << "serialising models of type: " << modelType.c_str() << std::endl;
     std::string listing;
@@ -228,15 +212,39 @@ std::string Data::serialiseModelsOfType(const std::string& modelType) const
     std::vector<std::string> models = mRdfGraph->getModelsOfType(modelType);
     for (auto it = models.begin(); it != models.end(); ++it)
     {
-        std::string s = mRdfGraph->getResourceTitle(*it);
-        Json::Value m;
-        m["uri"] = *it;
+        //std::string s = mRdfGraph->getResourceTitle(*it);
+        std::string id = mapModelUri(*it);
+        Json::Value m = id;
+        /*m["uri"] = *it;
         m["id"] = *it;
         m["name"] = s;
         m["type"] = modelType;
-        m["hasChildren"] = false;
+        m["hasChildren"] = false;*/
         root["children"].append(m);
     }
     listing = Json::FastWriter().write(root);
     return listing;
+}
+
+std::string Data::mapModelId(const std::string &id)
+{
+    std::cout << "mapping ID: " << id.c_str() << "; to a URI." << std::endl;
+    if (mModelIdMap.count(id)) return mModelIdMap[id];
+    return std::string();
+}
+
+std::string& Data::mapModelUri(const std::string &uri)
+{
+    std::cout << "mapping URI: " << uri.c_str() << "; to an ID." << std::endl;
+    static int idCounter = 1024;
+    // if the uri is already mapped, return the ID
+    if (mModelUriMap.count(uri)) return mModelUriMap[uri];
+    // otherwise we need to add it to the map
+    std::ostringstream oss;
+    oss << idCounter++;
+    std::string id = "m" + oss.str();
+    mModelUriMap[uri] = id;
+    mModelIdMap[id] = uri;
+    std::cout << "Map created: ID " << id.c_str() << "; uri " << uri.c_str() << ";" << std::endl;
+    return mModelUriMap[uri];
 }
