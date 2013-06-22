@@ -251,7 +251,7 @@ int startServer(int port, const char* serverType, GMS::Data* data)
     }
     else if (0 == strcmp(serverType, "GMS"))
     {
-        d = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, port, NULL,
+        d = MHD_start_daemon(MHD_USE_SELECT_INTERNALLY, port, NULL,
                 NULL, &url_handler, static_cast<void*>(data), MHD_OPTION_END);
     }
     if (d == NULL)
