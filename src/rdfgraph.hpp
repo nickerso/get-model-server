@@ -26,8 +26,14 @@ public:
       */
     std::string getResourceImageUrl(const std::string &uri);
 
+    /**
+      * Trying to work around thread-safety in Redland, need to re-create RDF graph each time we want to use it?
+      */
+    void cacheGraph();
+
 private:
     RedlandContainer* mRedlandContainer;
+    std::string mGraphCache;
 };
 
 #endif // RDFGRAPH_HPP

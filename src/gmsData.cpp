@@ -75,6 +75,8 @@ int Data::initialiseModelDatabase(const std::string &repositoryRoot)
     mModelList = splitString(data, '\n', mModelList);
     WorkspaceLoader loader(this, mRepositoryRoot);
     for_each(mModelList.begin(), mModelList.end(), loader);
+    // we have loaded all the RDF, so create the cache for actual use.
+    mRdfGraph->cacheGraph();
 
     struct sedml_document* doc = sedml_create_document();
     int r = sedml_read_file("http://models.cellml.org/w/andre/sine/rawfile/293afb20feb51d1739b6645eaf2cd18b1a4f3bcb/sin_approximations_sedml.xml", NULL, doc);
