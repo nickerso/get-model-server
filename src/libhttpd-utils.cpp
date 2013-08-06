@@ -237,7 +237,7 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
 
 int startServer(int port, const char* serverType, GMS::Data* data)
 {
-    struct MHD_Daemon * d;
+    struct MHD_Daemon * d = 0;
 
     if (0 == strcmp(serverType, "echo"))
     {

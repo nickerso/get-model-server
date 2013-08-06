@@ -25,10 +25,10 @@ API::~API()
     std::cout << "Destroying a GMS::API object from the GET model server" << std::endl;
 }
 
-const char API::URL_MODEL[] = "/models/";
-const char API::URL_QUERY[] = "/query";
-const char API::URL_SEARCH[] = "/search";
-const char API::URL_DOJO_TEST[] = "/dojo-test";
+const std::string API::URL_MODEL = "/models/";
+const std::string API::URL_QUERY = "/query";
+const std::string API::URL_SEARCH = "/search";
+const std::string API::URL_DOJO_TEST = "/dojo-test";
 
 std::string API::executeAPI(const std::string& url, const std::map<std::string, std::string>& argvals,
                             GMS::Data *data)
@@ -51,7 +51,7 @@ std::string API::executeAPI(const std::string& url, const std::map<std::string, 
     }
     // FIXME: will this just be done as queries on the model URL?
     // else check for a search/query-type URL (/search?species=rat&membrane=basal, /query/?author=andre, etc.)
-    std::string urlTest = url.substr(0, strlen(URL_SEARCH) > strlen(URL_QUERY) ? strlen(URL_SEARCH) : strlen(URL_QUERY));
+    std::string urlTest = url.substr(0, URL_SEARCH.size() > URL_QUERY.size() ? URL_SEARCH.size() : URL_QUERY.size());
     if (urlTest.find('/', 1) == std::string::npos) urlTest.push_back('/');
     if ((urlTest == URL_SEARCH) || (urlTest == URL_QUERY))
     {
