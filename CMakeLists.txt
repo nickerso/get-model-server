@@ -26,10 +26,10 @@ set(PLATFORM_LIBS "curl" "xml2")
 
 # Set compiler flags
 if (WIN32)
-else(WIN32)
+else (WIN32)
     add_definitions("-std=c++11" "-Wall" "-Werror")
     set(PLATFORM_LIBS ${PLATFORM_LIBS} "m")
-endif(WIN32)
+endif (WIN32)
 
 add_definitions(${LIBXML2_DEFINITIONS})
 
@@ -37,8 +37,8 @@ add_definitions(${LIBXML2_DEFINITIONS})
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_SOURCE_DIR}/jsoncpp
-  ${clibsedml_INCLUDE_DIRS}
-  ${libcsim_INCLUDE_DIRS}
+  ${CLIBSEDML_INCLUDE_DIRS}
+  ${LIBCSIM_INCLUDE_DIRS}
   ${librdf_INCLUDE_DIRS}
   ${libraptor_INCLUDE_DIRS}
   ${librasqal_INCLUDE_DIRS}
@@ -69,7 +69,8 @@ TARGET_LINK_LIBRARIES(${EXECUTABLE_NAME}
   ${libraptor_LIBRARIES}
   ${librasqal_LIBRARIES}
   ${libcsim_LIBRARIES}
-  ${clibsedml_LIBRARIES}
+  ${CLIBSEDML_LIBRARIES}
   ${LIBXML2_LIBRARIES}
   ${PLATFORM_LIBS}
 )
+
