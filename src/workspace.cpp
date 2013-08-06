@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include "workspace.hpp"
 #include "contentItem.hpp"
@@ -50,7 +51,7 @@ Workspace::Workspace(const std::string &url, const std::string &id) : mUrl(url),
         XmlDoc xml;
         xml.parseString(manifest);
         mContentItems = xml.processManifest();
-        for (int i=0; i < mContentItems.size(); ++i)
+        for (size_t i=0; i < mContentItems.size(); ++i)
         {
             std::cout << "Content item: " << i+1 << "\n";
             std::cout << "**  location: " << mContentItems[i]->getLocation().c_str() << "\n";
@@ -65,7 +66,7 @@ Workspace::Workspace(const std::string &url, const std::string &id) : mUrl(url),
 
 Workspace::~Workspace()
 {
-    for (int i = 0; i < mContentItems.size(); ++i)
+    for (size_t i = 0; i < mContentItems.size(); ++i)
     {
         ContentItem* item = mContentItems.back();
         mContentItems.pop_back();
