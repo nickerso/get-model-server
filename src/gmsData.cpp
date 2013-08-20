@@ -184,7 +184,8 @@ std::string Data::performModelAction(const std::string &modelId, const std::stri
     std::cout << "performing action: '" << action.c_str() << "' on model: " << modelURI.c_str() << std::endl;
     Json::Value root;
     if (action == "title") root["title"] = mRdfGraph->getResourceTitle(modelURI);
-    else if (action == "image") {
+    else if (action == "image")
+    {
         std::string imageUri = mRdfGraph->getResourceImageUrl(modelURI);
         if (imageUri != "")
         {
@@ -197,6 +198,24 @@ std::string Data::performModelAction(const std::string &modelId, const std::stri
                            << reader.getFormattedErrorMessages();
             }
         }
+    }
+    else if (action == "protocols")
+    {
+        Json::Value option;
+        option["value"] = "fred";
+        option["label"] = "<b>Fr</b>eD";
+        option["disabled"] = false;
+        option["selected"] = false;
+        root.append(option);
+        option["value"] = "bobby";
+        option["label"] = "<b>BOBB</b>y";
+        root.append(option);
+        option["value"] = "fas";
+        option["label"] = "asdg";
+        root.append(option);
+        option["value"] = "asghe5q5";
+        option["label"] = "SQGARyq35ygsargaw5y32yWE%HRGSGERdgg354tawergrae5he53276yWRHWE%Y";
+        root.append(option);
     }
     else
     {
