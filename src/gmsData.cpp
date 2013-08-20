@@ -201,21 +201,19 @@ std::string Data::performModelAction(const std::string &modelId, const std::stri
     }
     else if (action == "protocols")
     {
-        Json::Value option;
-        option["value"] = "fred";
-        option["label"] = "<b>Fr</b>eD";
-        option["disabled"] = false;
-        option["selected"] = false;
-        root.append(option);
-        option["value"] = "bobby";
-        option["label"] = "<b>BOBB</b>y";
-        root.append(option);
-        option["value"] = "fas";
-        option["label"] = "asdg";
-        root.append(option);
-        option["value"] = "asghe5q5";
-        option["label"] = "SQGARyq35ygsargaw5y32yWE%HRGSGERdgg354tawergrae5he53276yWRHWE%Y";
-        root.append(option);
+        std::vector<std::string> protocolUris = mRdfGraph->getResourceProtocolUris(modelURI);
+        for (auto it = protocolUris.begin(); it != protocolUris.end(); ++it)
+        {
+            std::string id = mapModelUri(*it);
+            std::cout << "Protocol found: " << it->c_str() << "; ID: " << id.c_str() << std::endl;
+            // create the options for the selection widget
+            Json::Value option;
+            option["value"] = id;
+            option["label"] = mRdfGraph->getResourceTitle(*it);
+            option["disabled"] = false;
+            option["selected"] = false;
+            root["protocols"].append(option);
+        }
     }
     else
     {

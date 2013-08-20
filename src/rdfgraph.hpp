@@ -31,6 +31,11 @@ public:
       */
     void cacheGraph();
 
+    /**
+      * Returns a list of all the protocols for the given resource.
+      */
+    std::vector<std::string> getResourceProtocolUris(const std::string& uri);
+
 private:
     RedlandContainer* mRedlandContainer;
     std::string mGraphCache;
