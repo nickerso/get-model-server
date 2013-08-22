@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <sedml/reader.h>
 #include <json/json.h>
 #include <json/json-forwards.h>
 

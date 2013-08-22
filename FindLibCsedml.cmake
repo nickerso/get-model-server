@@ -12,7 +12,7 @@
 
 # Include dir
 find_path(CLIBSEDML_INCLUDE_DIR
-  NAMES sedml/document.h
+  NAMES sedml/SedTypes.h
   PATHS ${clibsedml_PKGCONF_INCLUDE_DIRS}
 )
 
