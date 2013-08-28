@@ -3,9 +3,12 @@
 
 #include <vector>
 #include <map>
+#include <sedml/SedTypes.h>
 
 class Workspace;
 class RdfGraph;
+
+LIBSEDML_CPP_NAMESPACE_USE
 
 namespace GMS
 {
@@ -59,12 +62,19 @@ namespace GMS
           */
         std::string mapModelId(const std::string& id);
 
+        /**
+          * Returns the Simulation Description document for the given URI, if possible. The SED-ML
+          * document will be loaded if not already parsed.
+          */
+        SedDocument* mapUriToSed(const std::string& uri);
+
     private:
         std::string mRepositoryRoot;
         std::vector<std::string> mModelList;
         std::map<std::string, Workspace*> mWorkspaces;
         std::map<std::string, std::string> mModelIdMap; // ID -> URI map
         std::map<std::string, std::string> mModelUriMap; // URI -> ID map
+        std::map<std::string, SedDocument*> mSimulationDescriptions;
         RdfGraph* mRdfGraph;
     };
 }

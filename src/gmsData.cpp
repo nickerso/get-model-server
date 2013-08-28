@@ -16,6 +16,7 @@
 #define MODEL_TYPE_TRANSPORTER    "http://cellml.sourceforge.net/ns/model-type/transport-protein"
 
 using namespace GMS;
+LIBSEDML_CPP_NAMESPACE_USE
 
 class WorkspaceLoader
 {
@@ -63,6 +64,14 @@ Data::Data()
 Data::~Data()
 {
     std::cout << "Destroying the GMS::Data from the GET model server." << std::endl;
+    for (auto it = mWorkspaces.begin(); it != mWorkspaces.end(); ++it)
+    {
+        if (it->second) delete it->second;
+    }
+    for (auto it = mSimulationDescriptions.begin(); it != mSimulationDescriptions.end(); ++it)
+    {
+        if (it->second) delete it->second;
+    }
     if (mRdfGraph) delete mRdfGraph;
 }
 
@@ -162,7 +171,7 @@ std::string Data::performModelAction(const std::string &modelId, const std::stri
 {
     std::string modelURI = mapModelId(modelId);
     if (modelURI == "") return "";
-    std::cout << "performing action: '" << action.c_str() << "' on model: " << modelURI.c_str() << std::endl;
+    std::cout << "performing action: '" << action.c_str() << "' on resource: " << modelURI.c_str() << std::endl;
     Json::Value root;
     if (action == "title") root["title"] = mRdfGraph->getResourceTitle(modelURI);
     else if (action == "image")
@@ -194,6 +203,14 @@ std::string Data::performModelAction(const std::string &modelId, const std::stri
             option["disabled"] = false;
             option["selected"] = false;
             root["protocols"].append(option);
+        }
+    }
+    else if (action == "outputs")
+    {
+        SedDocument* sed = mapUriToSed(modelURI);
+        if (sed)
+        {
+            root = getSedOutputsJson(sed);
         }
     }
     else
@@ -247,4 +264,27 @@ std::string& Data::mapModelUri(const std::string &uri)
     mModelIdMap[id] = uri;
     std::cout << "Map created: ID " << id.c_str() << "; uri " << uri.c_str() << ";" << std::endl;
     return mModelUriMap[uri];
+}
+
+SedDocument* Data::mapUriToSed(const std::string &uri)
+{
+    std::cout << "mapping URI: " << uri.c_str() << "; to a SED-ML document." << std::endl;
+    // get the URL of the actual SED-ML document
+    std::string sedUrl = mRdfGraph->getResourceSedUrl(uri);
+    if (sedUrl.empty()) return 0;
+
+    // return the SED-ML document if we already have one
+    if (mSimulationDescriptions.count(sedUrl)) return mSimulationDescriptions[sedUrl];
+    // otherwise need to parse it
+    std::string sedDocumentString = getUrlContent(sedUrl);
+    SedDocument* doc;
+    doc = readSedMLFromString(sedDocumentString.c_str());
+    if (doc->getErrorLog()->getNumFailsWithSeverity(LIBSEDML_SEV_ERROR) > 0)
+    {
+        std::cout << doc->getErrorLog()->toString();
+        delete doc;
+        return 0;
+    }
+    mSimulationDescriptions[uri] = doc;
+    return doc;
 }

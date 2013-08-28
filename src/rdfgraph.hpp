@@ -27,6 +27,12 @@ public:
     std::string getResourceImageUrl(const std::string &uri);
 
     /**
+      * Looks for a csim:sed for the given resource and returns it. Expected to be a URL to
+      * the SED-ML document.
+      */
+    std::string getResourceSedUrl(const std::string &uri);
+
+    /**
       * Trying to work around thread-safety in Redland, need to re-create RDF graph each time we want to use it?
       */
     void cacheGraph();
