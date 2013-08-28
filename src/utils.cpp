@@ -4,6 +4,8 @@
 #include <sstream>
 #include <iostream>
 #include <libxml/uri.h>
+#include <json/json.h>
+#include <sedml/SedTypes.h>
 
 #include "utils.hpp"
 
@@ -85,4 +87,39 @@ std::string urlChildOf(const std::string& url, const std::string& base)
         result = url.substr(base.size());
     }
     return result;
+}
+
+Json::Value getSedOutputsJson(SedDocument *doc)
+{
+    Json::Value root;
+    std::cout << "The document has " << doc->getNumOutputs() << " output(s)." << std::endl;
+    for (unsigned int i = 0; i < doc->getNumOutputs(); ++i)
+    {
+        SedOutput* current = doc->getOutput(i);
+        switch(current->getTypeCode())
+        {
+          case SEDML_OUTPUT_REPORT:
+          {
+            SedReport* r = static_cast<SedReport*>(current);
+            std::cout << "\tReport id=" << current->getId() << " numDataSets=" << r->getNumDataSets() << std::endl;
+            break;
+          }
+          case SEDML_OUTPUT_PLOT2D:
+          {
+            SedPlot2D* p = static_cast<SedPlot2D*>(current);
+            std::cout << "\tPlot2d id=" << current->getId() << " numCurves=" << p->getNumCurves() << std::endl;
+            break;
+          }
+          case SEDML_OUTPUT_PLOT3D:
+          {
+            SedPlot3D* p = static_cast<SedPlot3D*>(current);
+            std::cout << "\tPlot3d id=" << current->getId() << " numSurfaces=" << p->getNumSurfaces() << std::endl;
+            break;
+          }
+          default:
+            std::cout << "\tEncountered unknown output " << current->getId() << std::endl;
+            break;
+        }
+      }
+    return root;
 }
