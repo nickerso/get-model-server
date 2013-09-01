@@ -174,6 +174,7 @@ std::string Data::performModelAction(const std::string &modelId, const std::stri
     std::cout << "performing action: '" << action.c_str() << "' on resource: " << modelURI.c_str() << std::endl;
     Json::Value root;
     if (action == "title") root["title"] = mRdfGraph->getResourceTitle(modelURI);
+    else if (action == "type") root["type"] = mRdfGraph->getResourceType(modelURI);
     else if (action == "image")
     {
         std::string imageUri = mRdfGraph->getResourceImageUrl(modelURI);

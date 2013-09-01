@@ -266,6 +266,37 @@ std::string RdfGraph::getResourceImageUrl(const std::string &uri)
     return imageUrl;
 }
 
+std::string RdfGraph::getResourceType(const std::string &uri)
+{
+    RedlandGraph rdf(mRedlandContainer->world, mGraphCache);
+    std::string typeUri = "";
+    std::string queryString = "select * where { <";
+    queryString += uri;
+    queryString += "> <"BQBIO_NS"property> ?type }";
+    std::cout << "query string: " << queryString.c_str() << std::endl;
+    librdf_query* query = librdf_new_query(mRedlandContainer->world, "sparql", NULL, (const unsigned char*)(queryString.c_str()), NULL);
+    librdf_query_results* results = librdf_model_query_execute(rdf.model, query);
+    if (results)
+    {
+        if (librdf_query_results_is_bindings(results))
+        {
+            // protection from there being no results.
+            if (!librdf_query_results_finished(results))
+            {
+                librdf_node* node = librdf_query_results_get_binding_value_by_name(results, "type");
+                if (0) printNodeType(node);
+                librdf_uri* u = librdf_node_get_uri(node);
+                librdf_free_node(node);
+                typeUri = std::string((char*)(librdf_uri_as_string(u)));
+                std::cout << "type URI: " << typeUri.c_str() << std::endl;
+            }
+        }
+        librdf_free_query_results(results);
+    }
+    librdf_free_query(query);
+    return typeUri;
+}
+
 std::string RdfGraph::getResourceSedUrl(const std::string &uri)
 {
     RedlandGraph rdf(mRedlandContainer->world, mGraphCache);
