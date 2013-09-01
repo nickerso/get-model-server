@@ -96,30 +96,50 @@ Json::Value getSedOutputsJson(SedDocument *doc)
     for (unsigned int i = 0; i < doc->getNumOutputs(); ++i)
     {
         SedOutput* current = doc->getOutput(i);
+        Json::Value output;
+        if (current->isSetId()) output["id"] = current->getId();
         switch(current->getTypeCode())
         {
-          case SEDML_OUTPUT_REPORT:
-          {
+        case SEDML_OUTPUT_REPORT:
+        {
+            output["type"] = "report";
             SedReport* r = static_cast<SedReport*>(current);
             std::cout << "\tReport id=" << current->getId() << " numDataSets=" << r->getNumDataSets() << std::endl;
+            output["numberOfDataSets"] = r->getNumDataSets();
             break;
-          }
-          case SEDML_OUTPUT_PLOT2D:
-          {
+        }
+        case SEDML_OUTPUT_PLOT2D:
+        {
+            output["type"] = "plot2d";
             SedPlot2D* p = static_cast<SedPlot2D*>(current);
             std::cout << "\tPlot2d id=" << current->getId() << " numCurves=" << p->getNumCurves() << std::endl;
+            for (unsigned int j = 0; j < p->getNumCurves(); ++j)
+            {
+                const SedCurve* curve = p->getCurve(j);
+                Json::Value c;
+                // always have an index, id optional? so use the id to index this curve
+                c["index"] = j;
+                if (curve->isSetId()) c["id"] = curve->getId();
+                if (curve->isSetName()) c["name"] = curve->getName();
+                // required attributes, so no need to check them
+                c["logX"] = curve->getLogX();
+                c["logY"] = curve->getLogY();
+                output["curves"].append(c);
+            }
             break;
-          }
-          case SEDML_OUTPUT_PLOT3D:
-          {
+        }
+        case SEDML_OUTPUT_PLOT3D:
+        {
+            output["type"] = "plot3d";
             SedPlot3D* p = static_cast<SedPlot3D*>(current);
             std::cout << "\tPlot3d id=" << current->getId() << " numSurfaces=" << p->getNumSurfaces() << std::endl;
             break;
-          }
-          default:
+        }
+        default:
             std::cout << "\tEncountered unknown output " << current->getId() << std::endl;
             break;
         }
-      }
+        root.append(output);
+    }
     return root;
 }
