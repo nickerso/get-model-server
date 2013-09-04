@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <sedml/reader.h>
+#include <sedml/SedReader.h>
 #include <json/json.h>
 #include <json/json-forwards.h>
 
@@ -78,24 +78,17 @@ int Data::initialiseModelDatabase(const std::string &repositoryRoot)
     // we have loaded all the RDF, so create the cache for actual use.
     mRdfGraph->cacheGraph();
 
-    struct sedml_document* doc = sedml_create_document();
-    int r = sedml_read_file("http://models.cellml.org/w/andre/sine/rawfile/293afb20feb51d1739b6645eaf2cd18b1a4f3bcb/sin_approximations_sedml.xml", NULL, doc);
-    if (!r)
+    SedReader reader;
+    SedDocument *doc = reader.readSedMLFromFile("http://models.cellml.org/w/andre/sine/rawfile/293afb20feb51d1739b6645eaf2cd18b1a4f3bcb/sin_approximations_sedml.xml");
+    if (doc->getNumErrors() == 0)
     {
         std::cout << "r is zero!\n";
-        if (doc->sedml)
-        {
-            std::cout << "Found a SED-ML document with level: " << doc->sedml->level << "; version: "
-                      << doc->sedml->version << std::endl;
-        }
-        else
-        {
-            std::cout << "no sedml document?\n";
-        }
+        std::cout << "Found a SED-ML document with level: " << doc->getLevel() << "; version: "
+                  << doc->getVersion() << std::endl;
     }
     else
     {
-        std::cout << "r is not zero! " << r << std::endl;
+        std::cout << "r is not zero! " << doc->getError(0)->getErrorId() << std::endl;
     }
     /*std::cout << "Model Listing:\n";
     for (int i = 0; i < mModelList.size(); ++i)

@@ -1,33 +1,27 @@
-# - Try to find clibsedml
+# - Try to find SEDML
 # Once done, this will define
 #
-#  CLIBSEDML_FOUND        - clibsedml was found
-#  CLIBSEDML_INCLUDE_DIRS - the clibsedml include directories
-#  CLIBSEDML_LIBRARIES    - link these to use clibsedml
-
-#include(LibFindMacros)
-
-# Use pkg-config to get hints about paths
-#libfind_pkg_check_modules(clibsedml_PKGCONF clibsedml)
+#  SEDML_FOUND        - sedml was found
+#  SEDML_INCLUDE_DIRS - the sedml include directories
+#  SEDML_LIBRARIES    - link these to use sedml
 
 # Include dir
-find_path(CLIBSEDML_INCLUDE_DIR
+find_path(SEDML_INCLUDE_DIR
   NAMES sedml/SedTypes.h
-  PATHS ${clibsedml_PKGCONF_INCLUDE_DIRS}
 )
 
 # Finally the library itself
-find_library(CLIBSEDML_LIBRARY
-  NAMES ${CLIBSEDML_NAMES} sedml
-  PATHS ${clibsedml_PKGCONF_LIBRARY_DIRS}
+find_library(SEDML_LIBRARY
+  NAMES ${SEDML_NAMES} sedml
 )
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(cLibsedml CLIBSEDML_LIBRARY CLIBSEDML_INCLUDE_DIR)
+find_package_handle_standard_args(SEDML SEDML_LIBRARY SEDML_INCLUDE_DIR)
 
-if(CLIBSEDML_FOUND)
-  set(CLIBSEDML_INCLUDE_DIRS ${CLIBSEDML_INCLUDE_DIR})
-  set(CLIBSEDML_LIBRARIES ${CLIBSEDML_LIBRARY})
-endif(CLIBSEDML_FOUND)
+if(SEDML_FOUND)
+  set(SEDML_INCLUDE_DIRS ${SEDML_INCLUDE_DIR})
+  set(SEDML_LIBRARIES ${SEDML_LIBRARY})
+endif(SEDML_FOUND)
 
-mark_as_advanced(CLIBSEDML_LIBRARY CLIBSEDML_INCLUDE_DIR)
+mark_as_advanced(SEDML_LIBRARY SEDML_INCLUDE_DIR)
+

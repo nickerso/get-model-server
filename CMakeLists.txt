@@ -24,6 +24,16 @@ FIND_PACKAGE(LibXml2 REQUIRED QUIET)
 
 set(PLATFORM_LIBS "curl" "xml2")
 
+# Set build type default.
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+	"Choose the build type. The options are: None (CMAKE_CXX_FLAGS or
+	 CMAKE_C_FLAGS are used), Debug, Release, RelWithDebInfo, MinSizeRel.")
+if("${CMAKE_BUILD_TYPE}" STREQUAL "")
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+  "Choose the build type. The options are: None (CMAKE_CXX_FLAGS or
+  CMAKE_C_FLAGS are used), Debug, Release, RelWithDebInfo, MinSizeRel." FORCE)
+endif()
+
 # Set compiler flags
 if (WIN32)
 else (WIN32)
@@ -37,7 +47,7 @@ add_definitions(${LIBXML2_DEFINITIONS})
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_SOURCE_DIR}/jsoncpp
-  ${CLIBSEDML_INCLUDE_DIRS}
+  ${SEDML_INCLUDE_DIRS}
   ${LIBCSIM_INCLUDE_DIRS}
   ${librdf_INCLUDE_DIRS}
   ${libraptor_INCLUDE_DIRS}
@@ -69,7 +79,7 @@ TARGET_LINK_LIBRARIES(${EXECUTABLE_NAME}
   ${libraptor_LIBRARIES}
   ${librasqal_LIBRARIES}
   ${libcsim_LIBRARIES}
-  ${CLIBSEDML_LIBRARIES}
+  ${SEDML_LIBRARIES}
   ${LIBXML2_LIBRARIES}
   ${PLATFORM_LIBS}
 )
