@@ -21,6 +21,12 @@ public:
     std::string getResourceTitle(const std::string& uri);
 
     /**
+      * Looks for a bqbio:property for the given resource and returns it. If a bqbio:property
+      * is not found, returns the string "unknown".
+      */
+    std::string getResourceType(const std::string& uri);
+
+    /**
       * Looks for a csim:image for the given resource and returns it. Expected to be a URL to
       * the image.
       */
