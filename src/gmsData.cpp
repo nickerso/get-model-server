@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <sedml/SedTypes.h>
+#include <sedml/reader.h>
 #include <json/json.h>
 #include <json/json-forwards.h>
 
@@ -16,7 +16,6 @@
 #define MODEL_TYPE_TRANSPORTER    "http://cellml.sourceforge.net/ns/model-type/transport-protein"
 
 using namespace GMS;
-LIBSEDML_CPP_NAMESPACE_USE
 
 class WorkspaceLoader
 {
@@ -64,14 +63,6 @@ Data::Data()
 Data::~Data()
 {
     std::cout << "Destroying the GMS::Data from the GET model server." << std::endl;
-    for (auto it = mWorkspaces.begin(); it != mWorkspaces.end(); ++it)
-    {
-        if (it->second) delete it->second;
-    }
-    for (auto it = mSimulationDescriptions.begin(); it != mSimulationDescriptions.end(); ++it)
-    {
-        if (it->second) delete it->second;
-    }
     if (mRdfGraph) delete mRdfGraph;
 }
 
@@ -87,6 +78,25 @@ int Data::initialiseModelDatabase(const std::string &repositoryRoot)
     // we have loaded all the RDF, so create the cache for actual use.
     mRdfGraph->cacheGraph();
 
+    struct sedml_document* doc = sedml_create_document();
+    int r = sedml_read_file("http://models.cellml.org/w/andre/sine/rawfile/293afb20feb51d1739b6645eaf2cd18b1a4f3bcb/sin_approximations_sedml.xml", NULL, doc);
+    if (!r)
+    {
+        std::cout << "r is zero!\n";
+        if (doc->sedml)
+        {
+            std::cout << "Found a SED-ML document with level: " << doc->sedml->level << "; version: "
+                      << doc->sedml->version << std::endl;
+        }
+        else
+        {
+            std::cout << "no sedml document?\n";
+        }
+    }
+    else
+    {
+        std::cout << "r is not zero! " << r << std::endl;
+    }
     /*std::cout << "Model Listing:\n";
     for (int i = 0; i < mModelList.size(); ++i)
     {
@@ -169,55 +179,46 @@ std::string Data::serialiseModel(const std::string& id)
 
 std::string Data::performModelAction(const std::string &modelId, const std::string &action)
 {
+    bool parsingSuccessful = false;
+    std::string listing = "";
     std::string modelURI = mapModelId(modelId);
     if (modelURI == "") return "";
-    std::cout << "performing action: '" << action.c_str() << "' on resource: " << modelURI.c_str() << std::endl;
+    std::cout << "performing action: '" << action.c_str() << "' on model: " << modelURI.c_str() << std::endl;
     Json::Value root;
-    if (action == "title") root["title"] = mRdfGraph->getResourceTitle(modelURI);
-    else if (action == "image")
+    if (action == "title")
     {
+        root["title"] = mRdfGraph->getResourceTitle(modelURI);
+        listing = Json::FastWriter().write(root);
+    }
+    else if (action == "image") {
         std::string imageUri = mRdfGraph->getResourceImageUrl(modelURI);
         if (imageUri != "")
         {
             std::string jsonString = getUrlContent(imageUri);
+            std::cout << "===================" << std::endl;
+            std::cout << jsonString;
+            std::cout << "===================" << std::endl;
             Json::Reader reader;
-            bool parsingSuccessful = reader.parse(jsonString, root, /*discard comments*/false);
+            parsingSuccessful = reader.parse(jsonString, root, /*discard comments*/false);
             if (!parsingSuccessful)
             {
                 std::cout  << "Failed to parse iamge file: " << imageUri.c_str() << "\n"
                            << reader.getFormattedErrorMessages();
             }
-        }
-    }
-    else if (action == "protocols")
-    {
-        std::vector<std::string> protocolUris = mRdfGraph->getResourceProtocolUris(modelURI);
-        for (auto it = protocolUris.begin(); it != protocolUris.end(); ++it)
-        {
-            std::string id = mapModelUri(*it);
-            std::cout << "Protocol found: " << it->c_str() << "; ID: " << id.c_str() << std::endl;
-            // create the options for the selection widget
-            Json::Value option;
-            option["value"] = id;
-            option["label"] = mRdfGraph->getResourceTitle(*it);
-            option["disabled"] = false;
-            option["selected"] = false;
-            root["protocols"].append(option);
-        }
-    }
-    else if (action == "outputs")
-    {
-        SedDocument* sed = mapUriToSed(modelURI);
-        if (sed)
-        {
-            root = getSedOutputsJson(sed);
+            else
+            {
+                listing = jsonString;
+            }
         }
     }
     else
     {
         std::cout << "Unknown action to perform: " << action.c_str() << std::endl;
     }
-    std::string listing = Json::FastWriter().write(root);
+//    std::string listing = Json::FastWriter().write(root);
+//    std::cout << "===================" << std::endl;
+    std::cout << listing;
+    std::cout << "===================" << std::endl;
     return listing;
 }
 
@@ -264,27 +265,4 @@ std::string& Data::mapModelUri(const std::string &uri)
     mModelIdMap[id] = uri;
     std::cout << "Map created: ID " << id.c_str() << "; uri " << uri.c_str() << ";" << std::endl;
     return mModelUriMap[uri];
-}
-
-SedDocument* Data::mapUriToSed(const std::string &uri)
-{
-    std::cout << "mapping URI: " << uri.c_str() << "; to a SED-ML document." << std::endl;
-    // get the URL of the actual SED-ML document
-    std::string sedUrl = mRdfGraph->getResourceSedUrl(uri);
-    if (sedUrl.empty()) return 0;
-
-    // return the SED-ML document if we already have one
-    if (mSimulationDescriptions.count(sedUrl)) return mSimulationDescriptions[sedUrl];
-    // otherwise need to parse it
-    std::string sedDocumentString = getUrlContent(sedUrl);
-    SedDocument* doc;
-    doc = readSedMLFromString(sedDocumentString.c_str());
-    if (doc->getErrorLog()->getNumFailsWithSeverity(LIBSEDML_SEV_ERROR) > 0)
-    {
-        std::cout << doc->getErrorLog()->toString();
-        delete doc;
-        return 0;
-    }
-    mSimulationDescriptions[uri] = doc;
-    return doc;
 }
