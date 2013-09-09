@@ -92,6 +92,10 @@ int Data::initialiseModelDatabase(const std::string &repositoryRoot)
     {
         std::cout << "**" << mModelList[i] << "**\n";
     }*/
+    std::cout << "Models of type: *" << std::endl;
+    std::vector<std::string> models = mRdfGraph->getModelsOfType("*");
+    for (auto i = models.begin(); i != models.end(); ++i) std::cout << "Model: " << i->c_str() << std::endl;
+    std::cout << "End of models of type: *" << std::endl;
     return code;
 }
 
@@ -230,14 +234,13 @@ std::string Data::serialiseModelsOfType(const std::string& modelType)
     std::vector<std::string> models = mRdfGraph->getModelsOfType(modelType);
     for (auto it = models.begin(); it != models.end(); ++it)
     {
-        //std::string s = mRdfGraph->getResourceTitle(*it);
         std::string id = mapModelUri(*it);
-        Json::Value m = id;
-        /*m["uri"] = *it;
-        m["id"] = *it;
-        m["name"] = s;
-        m["type"] = modelType;
-        m["hasChildren"] = false;*/
+        Json::Value m;
+        m["id"] = id;
+        m["title"] = mRdfGraph->getResourceTitle(*it);
+        m["type"] = mRdfGraph->getResourceType(*it);
+        std::string imageUri = mRdfGraph->getResourceImageUrl(*it);
+        if (imageUri != "") m["image"] = getUrlContent(imageUri);
         root["children"].append(m);
     }
     listing = Json::FastWriter().write(root);

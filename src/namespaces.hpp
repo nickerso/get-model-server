@@ -18,5 +18,7 @@
 #define XML_NS               "http://www.w3.org/XML/1998/namespace"
 
 #define CSIM_NS              "http://cellml.sourceforge.net/csim/metadata/0.1#"
+#define CSIM_NS2             "http://cellml.sourceforge.net/ns"
+#define CSIM_MODEL_TYPE_NS   CSIM_NS2 "/model-type"
 
 #endif // NAMESPACES_HPP

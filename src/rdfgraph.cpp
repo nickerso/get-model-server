@@ -178,10 +178,20 @@ std::vector<std::string> RdfGraph::getModelsOfType(const std::string& typeUri)
 {
     RedlandGraph rdf(mRedlandContainer->world, mGraphCache);
     std::vector<std::string> r;
-    std::string queryString = "select * where { ?s ";
-    queryString += "<"BQBIO_NS"property> <";
-    queryString += typeUri;
-    queryString += ">}";
+    std::string queryString;
+    if (typeUri == "*")
+    {
+        // find all models with a type that we know about
+        queryString = "select * where { ?s <" BQBIO_NS "property> ?u . ";
+        queryString += "filter(regex(str(?u), \"^" CSIM_MODEL_TYPE_NS "\"))}";
+    }
+    else
+    {
+        queryString = "select * where { ?s ";
+        queryString += "<"BQBIO_NS"property> <";
+        queryString += typeUri;
+        queryString += ">}";
+    }
     std::cout << "query string: " << queryString.c_str() << std::endl;
     librdf_query* query = librdf_new_query(mRedlandContainer->world, "sparql", NULL, (const unsigned char*)(queryString.c_str()), NULL);
     librdf_query_results* results = librdf_model_query_execute(rdf.model, query);
