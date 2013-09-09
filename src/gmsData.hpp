@@ -48,7 +48,7 @@ namespace GMS
         std::string performModelAction(const std::string& modelId, const std::string& action);
 
         /**
-          * Serialise all models of the given type.
+          * Serialise all models of the given type. This is the primary method for models to get into the web application.
           */
         std::string serialiseModelsOfType(const std::string& modelType);
 
