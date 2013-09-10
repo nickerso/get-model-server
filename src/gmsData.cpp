@@ -192,6 +192,7 @@ std::string Data::performModelAction(const std::string &modelId, const std::stri
                 std::cout  << "Failed to parse iamge file: " << imageUri.c_str() << "\n"
                            << reader.getFormattedErrorMessages();
             }
+            std::cout << std::endl;
         }
     }
     else if (action == "protocols")

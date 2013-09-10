@@ -7,9 +7,9 @@ cmake_minimum_required(VERSION 2.8)
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
 
 IF(WIN32)
-    SET(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+	SET(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
 ELSE(WIN32)
-    #SET(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+	#SET(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
 ENDIF(WIN32)
 
 set(ENV{PKG_CONFIG_PATH} "/usr/local/lib/pkgconfig/:$ENV{PKG_CONFIG_PATH}")
@@ -19,16 +19,26 @@ FIND_PACKAGE(LibRDF REQUIRED)
 FIND_PACKAGE(LibRaptor REQUIRED)
 FIND_PACKAGE(LibRasqal REQUIRED)
 FIND_PACKAGE(LibCSim REQUIRED)
-FIND_PACKAGE(LibCsedml REQUIRED)
+FIND_PACKAGE(SEDML REQUIRED)
 FIND_PACKAGE(LibXml2 REQUIRED QUIET)
 
 set(PLATFORM_LIBS "curl" "xml2")
 
+# Set build type default.
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+	"Choose the build type. The options are: None (CMAKE_CXX_FLAGS or
+	 CMAKE_C_FLAGS are used), Debug, Release, RelWithDebInfo, MinSizeRel.")
+if("${CMAKE_BUILD_TYPE}" STREQUAL "")
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+  "Choose the build type. The options are: None (CMAKE_CXX_FLAGS or
+  CMAKE_C_FLAGS are used), Debug, Release, RelWithDebInfo, MinSizeRel." FORCE)
+endif()
+
 # Set compiler flags
 if (WIN32)
 else (WIN32)
-    add_definitions("-std=c++11" "-Wall" "-Werror")
-    set(PLATFORM_LIBS ${PLATFORM_LIBS} "m")
+	add_definitions("-std=c++11" "-Wall" "-Werror")
+	set(PLATFORM_LIBS ${PLATFORM_LIBS} "m")
 endif (WIN32)
 
 add_definitions(${LIBXML2_DEFINITIONS})
@@ -37,7 +47,7 @@ add_definitions(${LIBXML2_DEFINITIONS})
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_SOURCE_DIR}/jsoncpp
-  ${CLIBSEDML_INCLUDE_DIRS}
+  ${SEDML_INCLUDE_DIRS}
   ${LIBCSIM_INCLUDE_DIRS}
   ${librdf_INCLUDE_DIRS}
   ${libraptor_INCLUDE_DIRS}
@@ -69,8 +79,10 @@ TARGET_LINK_LIBRARIES(${EXECUTABLE_NAME}
   ${libraptor_LIBRARIES}
   ${librasqal_LIBRARIES}
   ${libcsim_LIBRARIES}
-  ${CLIBSEDML_LIBRARIES}
+  ${SEDML_LIBRARIES}
   ${LIBXML2_LIBRARIES}
   ${PLATFORM_LIBS}
 )
+
+INCLUDE(DocBuilder)
 
