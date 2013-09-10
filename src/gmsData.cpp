@@ -235,13 +235,14 @@ std::string Data::serialiseModelsOfType(const std::string& modelType)
     for (auto it = models.begin(); it != models.end(); ++it)
     {
         std::string id = mapModelUri(*it);
-        Json::Value m;
+        root.append(id);
+        /*Json::Value m;
         m["id"] = id;
         m["title"] = mRdfGraph->getResourceTitle(*it);
         m["type"] = mRdfGraph->getResourceType(*it);
         std::string imageUri = mRdfGraph->getResourceImageUrl(*it);
         if (imageUri != "") m["image"] = getUrlContent(imageUri);
-        root["children"].append(m);
+        root["children"].append(m);*/
     }
     listing = Json::FastWriter().write(root);
     return listing;
