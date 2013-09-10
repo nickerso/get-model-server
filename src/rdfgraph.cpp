@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <ctype.h>
+#include <cstring>
 #include <string>
 #include <cstdarg>
 #include <cstdlib>
@@ -57,7 +58,7 @@ static bool isNodeNill(librdf_node* node)
             char* uri = (char*)librdf_uri_to_string(librdf_node_get_uri(node));
             if (uri)
             {
-                if (strcmp(uri, RDF_NS"nill") == 0) code = true;
+                if (strcmp(uri, RDF_NS "nill") == 0) code = true;
                 free(uri);
             }
         }
@@ -179,7 +180,7 @@ std::vector<std::string> RdfGraph::getModelsOfType(const std::string& typeUri)
     RedlandGraph rdf(mRedlandContainer->world, mGraphCache);
     std::vector<std::string> r;
     std::string queryString = "select * where { ?s ";
-    queryString += "<"BQBIO_NS"property> <";
+    queryString += "<" BQBIO_NS "property> <";
     queryString += typeUri;
     queryString += ">}";
     std::cout << "query string: " << queryString.c_str() << std::endl;
@@ -211,7 +212,7 @@ std::string RdfGraph::getResourceTitle(const std::string &uri)
     std::string title = "untitled";
     std::string queryString = "select * where { <";
     queryString += uri;
-    queryString += "> <"DCTERMS_NS"title> ?t }";
+    queryString += "> <" DCTERMS_NS "title> ?t }";
     std::cout << "query string: " << queryString.c_str() << std::endl;
     librdf_query* query = librdf_new_query(mRedlandContainer->world, "sparql", NULL, (const unsigned char*)(queryString.c_str()), NULL);
     librdf_query_results* results = librdf_model_query_execute(rdf.model, query);
@@ -241,7 +242,7 @@ std::string RdfGraph::getResourceImageUrl(const std::string &uri)
     std::string imageUrl = "";
     std::string queryString = "select * where { <";
     queryString += uri;
-    queryString += "> <"CSIM_NS"image> ?image }";
+    queryString += "> <" CSIM_NS "image> ?image }";
     std::cout << "query string: " << queryString.c_str() << std::endl;
     librdf_query* query = librdf_new_query(mRedlandContainer->world, "sparql", NULL, (const unsigned char*)(queryString.c_str()), NULL);
     librdf_query_results* results = librdf_model_query_execute(rdf.model, query);
@@ -272,7 +273,7 @@ std::string RdfGraph::getResourceType(const std::string &uri)
     std::string typeUri = "";
     std::string queryString = "select * where { <";
     queryString += uri;
-    queryString += "> <"BQBIO_NS"property> ?type }";
+    queryString += "> <" BQBIO_NS "property> ?type }";
     std::cout << "query string: " << queryString.c_str() << std::endl;
     librdf_query* query = librdf_new_query(mRedlandContainer->world, "sparql", NULL, (const unsigned char*)(queryString.c_str()), NULL);
     librdf_query_results* results = librdf_model_query_execute(rdf.model, query);
@@ -303,7 +304,7 @@ std::string RdfGraph::getResourceSedUrl(const std::string &uri)
     std::string sedUrl = "";
     std::string queryString = "select * where { <";
     queryString += uri;
-    queryString += "> <"CSIM_NS"sed> ?sedml }";
+    queryString += "> <" CSIM_NS "sed> ?sedml }";
     std::cout << "query string: " << queryString.c_str() << std::endl;
     librdf_query* query = librdf_new_query(mRedlandContainer->world, "sparql", NULL, (const unsigned char*)(queryString.c_str()), NULL);
     librdf_query_results* results = librdf_model_query_execute(rdf.model, query);
@@ -334,7 +335,7 @@ std::vector<std::string> RdfGraph::getResourceProtocolUris(const std::string &ur
     std::vector<std::string> uris;
     std::string queryString = "select * where { <";
     queryString += uri;
-    queryString += "> <"CSIM_NS"protocols> ?protocols }";
+    queryString += "> <" CSIM_NS "protocols> ?protocols }";
     std::cout << "query string: " << queryString.c_str() << std::endl;
     librdf_query* query = librdf_new_query(mRedlandContainer->world, "sparql", NULL, (const unsigned char*)(queryString.c_str()), NULL);
     librdf_query_results* results = librdf_model_query_execute(rdf.model, query);
@@ -357,7 +358,7 @@ std::vector<std::string> RdfGraph::getResourceProtocolUris(const std::string &ur
                         break;
                     }
                     librdf_node* first = getTargetNode(mRedlandContainer->world, rdf.model,
-                                                       theRest, RDF_NS"first");
+                                                       theRest, RDF_NS "first");
                     if (first)
                     {
                         std::string urip = nodeGetURI(first);
@@ -366,7 +367,7 @@ std::vector<std::string> RdfGraph::getResourceProtocolUris(const std::string &ur
                         uris.push_back(urip);
 
                         librdf_node* rest = getTargetNode(mRedlandContainer->world, rdf.model,
-                                                          theRest, RDF_NS"rest");
+                                                          theRest, RDF_NS "rest");
                         librdf_free_node(theRest);
                         if (rest) theRest = rest;
                         else break;
