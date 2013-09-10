@@ -1,10 +1,10 @@
 .. _get-model-server-index:
 
-=========================================
-General Epithelial Transport Model Server
-=========================================
+=============================================
+Generalised Epithelial Transport Model Server
+=============================================
 
-The General Epithelial Transport (GET) Model Server is a thing.
+The Generalised Epithelial Transport (GET) Model Server is a thing.
 
 .. toctree::
    :maxdepth: 1

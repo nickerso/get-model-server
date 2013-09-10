@@ -5,7 +5,7 @@ find_package(Sphinx)
 if (SPHINX_FOUND)
   # List of documenation source files so they show up in Qt-Creator
   set( doc_srcs
-   docs/get-ms-index.rst
+	docs/get-ms-index.rst
 	docs/get-ms-build.rst
   )
 
