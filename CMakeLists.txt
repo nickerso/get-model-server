@@ -71,8 +71,22 @@ SET(SRCS
   src/dojotest.cpp
 )
 
+# Headers
+SET(HDRS
+  src/contentItem.hpp
+  src/dojotest.hpp
+  src/gmsApi.hpp
+  src/gmsData.hpp
+  src/libhttpd-utils.hpp
+  src/namespaces.hpp
+  src/rdfgraph.hpp
+  src/utils.hpp
+  src/workspace.hpp
+  src/xmlDoc.hpp
+)
+
 set(EXECUTABLE_NAME "gms")
-ADD_EXECUTABLE(${EXECUTABLE_NAME} ${SRCS})
+ADD_EXECUTABLE(${EXECUTABLE_NAME} ${SRCS} ${HDRS})
 TARGET_LINK_LIBRARIES(${EXECUTABLE_NAME}
   ${libmicrohttpd_LIBRARIES}
   ${librdf_LIBRARIES}
