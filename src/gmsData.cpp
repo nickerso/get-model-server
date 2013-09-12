@@ -10,10 +10,7 @@
 #include "workspace.hpp"
 #include "utils.hpp"
 #include "rdfgraph.hpp"
-
-#define MODEL_TYPE_SMALL_MOLECULE "http://cellml.sourceforge.net/ns/model-type/small-molecule"
-#define MODEL_TYPE_CELL           "http://cellml.sourceforge.net/ns/model-type/cell"
-#define MODEL_TYPE_TRANSPORTER    "http://cellml.sourceforge.net/ns/model-type/transport-protein"
+#include "namespaces.hpp"
 
 using namespace GMS;
 LIBSEDML_CPP_NAMESPACE_USE
@@ -209,6 +206,16 @@ std::string Data::performModelAction(const std::string &modelId, const std::stri
             option["selected"] = false;
             root["protocols"].append(option);
         }
+    }
+    else if (action == "regions")
+    {
+        Json::Value region;
+        region["name"] = "cytosol";
+        region["acceptTypes"].append(MODEL_TYPE_SMALL_MOLECULE);
+        root.append(region);
+        region["name"] = "basalMembrane";
+        region["acceptTypes"].append(MODEL_TYPE_TRANSPORTER);
+        root.append(region);
     }
     else if (action == "outputs")
     {

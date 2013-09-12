@@ -21,4 +21,9 @@
 #define CSIM_NS2             "http://cellml.sourceforge.net/ns"
 #define CSIM_MODEL_TYPE_NS   CSIM_NS2 "/model-type"
 
+#define MODEL_TYPE_SMALL_MOLECULE CSIM_MODEL_TYPE_NS "/small-molecule"
+#define MODEL_TYPE_CELL           CSIM_MODEL_TYPE_NS "/cell"
+#define MODEL_TYPE_TRANSPORTER    CSIM_MODEL_TYPE_NS "/transport-protein"
+
+
 #endif // NAMESPACES_HPP
