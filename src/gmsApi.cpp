@@ -29,6 +29,7 @@ const std::string API::URL_MODEL = "/models/";
 const std::string API::URL_QUERY = "/query";
 const std::string API::URL_SEARCH = "/search";
 const std::string API::URL_DOJO_TEST = "/dojo-test";
+const std::string API::URL_BIOMAPS = "/biomaps";
 
 std::string API::executeAPI(const std::string& url, const std::map<std::string, std::string>& argvals,
                             GMS::Data *data)
@@ -56,6 +57,13 @@ std::string API::executeAPI(const std::string& url, const std::map<std::string, 
     if ((urlTest == URL_SEARCH) || (urlTest == URL_QUERY))
     {
         return handleQueryRequest(url, argvals, data);
+    }
+
+    // a hack to get something working like biomaps needs
+    child = urlChildOf(url, URL_BIOMAPS);
+    if (child.size() > 0)
+    {
+        return handleBiomapsRequest(url, argvals, data);
     }
 
 #if 0
@@ -197,6 +205,38 @@ std::string API::handleModelRequest(const std::string& url, const std::map<std::
             std::cerr << "expecting model ID with exactly one action to perform: " << url.c_str() << std::endl;
             getInvalidResponse(response);
         }
+    }
+    else if (!argvals.empty())
+    {
+        // FIXME: type is the only argument we currently handle.
+        if (argvals.count("type")) response = data->serialiseModelsOfType(argvals.at("type"));
+        else getInvalidResponse(response);
+    }
+    else
+    {
+        // unhandled model request
+        std::cerr << "Unable to handle model request with args: " << url.c_str() << std::endl;
+        getInvalidResponse(response);
+    }
+    return response;
+}
+
+std::string API::handleBiomapsRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
+                                      GMS::Data* data)
+{
+    std::cout << "handleBiomapsRequest: " << url.c_str() << std::endl;
+    std::string response;
+    std::string trailer = urlChildOf(url, URL_BIOMAPS);
+    std::cout << "argvals: ";
+    for(auto iter=argvals.begin(); iter!=argvals.end(); ++iter)
+    {
+        std::cout << "args:: key(" << iter->first << ") -> value(" << iter->second << ")" << std::endl;
+    }
+    if (trailer.size() != 0)
+    {
+        std::vector<std::string> strings;
+        strings = splitString(trailer, '/', strings);
+        for (auto s=strings.begin(); s!=strings.end(); ++s) std::cout << "URL part: " << *s << std::endl;
     }
     else if (!argvals.empty())
     {
