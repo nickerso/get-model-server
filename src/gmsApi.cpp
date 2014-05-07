@@ -12,6 +12,7 @@
 #include "gmsData.hpp"
 #include "dojotest.hpp"
 #include "utils.hpp"
+#include "biomaps.hpp"
 
 using namespace GMS;
 
@@ -227,31 +228,59 @@ std::string API::handleBiomapsRequest(const std::string& url, const std::map<std
     std::cout << "\n\nhandleBiomapsRequest: " << url.c_str() << std::endl;
     std::string response;
     std::string trailer = urlChildOf(url, URL_BIOMAPS);
+    if (trailer[0] == '/') trailer.erase(trailer.begin());
     Biomaps* biomaps = data->getBiomaps();
     if (biomaps) std::cout << "Managed to get a biomaps manager object" << std::endl;
 
-    for(auto iter=argvals.begin(); iter!=argvals.end(); ++iter)
-    {
-        std::cout << "args:: key(" << iter->first << ") -> value(" << iter->second << ")" << std::endl;
-    }
+    std::string action = ""; // no default action
     if (trailer.size() != 0)
     {
         std::vector<std::string> strings;
         strings = splitString(trailer, '/', strings);
         for (auto s=strings.begin(); s!=strings.end(); ++s) std::cout << "URL part: " << *s << std::endl;
+        action = strings[0];
+        std::cout << "Found an action to perform: " << action << std::endl;
+    }
+    if (action == "load")
+    {
+        // load a model and return its ID
+        std::string modelUrl = urlChildOf(trailer, "load/");
+        response = biomaps->loadModel(modelUrl);
+    }
+    else if (action == "set-value")
+    {
+        // set the given variable values for the specified model
+    }
+    else if (action == "flag-output")
+    {
+        // flag the given variable as an output variable
+    }
+    else if (action == "reset")
+    {
+        // reset model back to initial state
+    }
+    else if (action == "execute")
+    {
+        // perform the simulation (and get output?)
+    }
+    else
+    {
+        // unhandled biomaps request
+        std::cerr << "Unable to handle biomaps request: " << url.c_str() << std::endl;
+        getInvalidResponse(response);
+    }
+
+    /*for(auto iter=argvals.begin(); iter!=argvals.end(); ++iter)
+    {
+        std::cout << "args:: key(" << iter->first << ") -> value(" << iter->second << ")" << std::endl;
     }
     else if (!argvals.empty())
     {
         // FIXME: type is the only argument we currently handle.
         if (argvals.count("type")) response = data->serialiseModelsOfType(argvals.at("type"));
         else getInvalidResponse(response);
-    }
-    else
-    {
-        // unhandled model request
-        std::cerr << "Unable to handle model request with args: " << url.c_str() << std::endl;
-        getInvalidResponse(response);
-    }
+    }*/
+
     return response;
 }
 
