@@ -11,6 +11,7 @@
 #include "utils.hpp"
 #include "rdfgraph.hpp"
 #include "namespaces.hpp"
+#include "biomaps.hpp"
 
 using namespace GMS;
 LIBSEDML_CPP_NAMESPACE_USE
@@ -52,7 +53,8 @@ public:
     Json::Value& jsonRoot;
 };
 
-Data::Data()
+Data::Data() :
+    mBiomaps(0)
 {
     std::cout << "Creating new GMS::Data for use in the GET model server." << std::endl;
     mRdfGraph = new RdfGraph();
@@ -70,6 +72,7 @@ Data::~Data()
         if (it->second) delete it->second;
     }
     if (mRdfGraph) delete mRdfGraph;
+    if (mBiomaps) delete mBiomaps;
 }
 
 int Data::initialiseModelDatabase(const std::string &repositoryRoot)
@@ -93,6 +96,10 @@ int Data::initialiseModelDatabase(const std::string &repositoryRoot)
     std::vector<std::string> models = mRdfGraph->getModelsOfType("*");
     for (auto i = models.begin(); i != models.end(); ++i) std::cout << "Model: " << i->c_str() << std::endl;
     std::cout << "End of models of type: *" << std::endl;
+
+    // since we know where the models are, we can create a biomaps manager object
+    if (mBiomaps) delete mBiomaps;
+    mBiomaps = new Biomaps(mRepositoryRoot);
     return code;
 }
 
