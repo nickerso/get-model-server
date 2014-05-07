@@ -224,10 +224,12 @@ std::string API::handleModelRequest(const std::string& url, const std::map<std::
 std::string API::handleBiomapsRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
                                       GMS::Data* data)
 {
-    std::cout << "handleBiomapsRequest: " << url.c_str() << std::endl;
+    std::cout << "\n\nhandleBiomapsRequest: " << url.c_str() << std::endl;
     std::string response;
     std::string trailer = urlChildOf(url, URL_BIOMAPS);
-    std::cout << "argvals: ";
+    Biomaps* biomaps = data->getBiomaps();
+    if (biomaps) std::cout << "Managed to get a biomaps manager object" << std::endl;
+
     for(auto iter=argvals.begin(); iter!=argvals.end(); ++iter)
     {
         std::cout << "args:: key(" << iter->first << ") -> value(" << iter->second << ")" << std::endl;

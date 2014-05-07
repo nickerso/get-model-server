@@ -7,6 +7,7 @@
 
 class Workspace;
 class RdfGraph;
+class Biomaps;
 
 LIBSEDML_CPP_NAMESPACE_USE
 
@@ -68,6 +69,15 @@ namespace GMS
           */
         SedDocument* mapUriToSed(const std::string& uri);
 
+        /**
+         * Just to keep the experimental biomaps code a bit separate from the rest of GMS for now.
+         * @return A pointer to the biomaps manager object for this data.
+         */
+        inline Biomaps* getBiomaps()
+        {
+            return mBiomaps;
+        }
+
     private:
         std::string mRepositoryRoot;
         std::vector<std::string> mModelList;
@@ -76,6 +86,7 @@ namespace GMS
         std::map<std::string, std::string> mModelUriMap; // URI -> ID map
         std::map<std::string, SedDocument*> mSimulationDescriptions;
         RdfGraph* mRdfGraph;
+        Biomaps* mBiomaps;
     };
 }
 #endif // GMSDATA_HPP

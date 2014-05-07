@@ -61,6 +61,7 @@ SET(SRCS
   src/utils.cpp
   src/rdfgraph.cpp
   src/dojotest.cpp
+  src/biomaps.cpp
 )
 
 set(EXECUTABLE_NAME "gms")
