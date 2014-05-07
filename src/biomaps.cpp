@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <json/json.h>
 #include <json/json-forwards.h>
+#include <CellmlSimulator.hpp>
 
 #include "biomaps.hpp"
 
@@ -25,17 +26,35 @@ Biomaps::Biomaps(const std::string& repositoryRoot) :
 
 Biomaps::~Biomaps()
 {
-    // nothing to do yet?
+    // clean up
+    for (auto it = mModels.begin(); it != mModels.end(); ++it)
+    {
+        if (it->second) delete it->second;
+    }
 }
 
 std::string Biomaps::loadModel(const std::string &url)
 {
+    std::string response;
     std::string modelUrl = mRepositoryRoot + url;
     std::cout << "loading model: " << modelUrl << std::endl;
-    std::string response;
+    // get the identifier we will use for this model
+    std::string bid = defineIdentifier();
+    CellmlSimulator* csim = new CellmlSimulator();
+    std::string modelString = csim->serialiseCellmlFromUrl(modelUrl);
+    if (csim->loadModelString(modelString) != 0)
+    {
+        delete csim;
+        response = "There was an error loading model: " + modelUrl;
+        return response;
+    }
+    // create the dummy simulation description - why?
+    csim->createSimulationDefinition();
+    // store the model for future use.
+    mModels[bid] = csim;
     Json::Value root;
     // load the model
-    root["id"] = defineIdentifier();
+    root["id"] = bid;
     response = Json::FastWriter().write(root);
     return response;
 }

@@ -1,6 +1,10 @@
 #ifndef BIOMAPS_HPP
 #define BIOMAPS_HPP
 
+#include <map>
+
+class CellmlSimulator;
+
 class Biomaps
 {
 public:
@@ -18,6 +22,7 @@ public:
 private:
     Biomaps();
     std::string mRepositoryRoot;
+    std::map<std::string, CellmlSimulator*> mModels;
 };
 
 #endif // BIOMAPS_HPP
