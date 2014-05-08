@@ -171,3 +171,33 @@ std::string Biomaps::setVariableValue(const std::string &modelId, const std::str
     return response;
 }
 
+std::string Biomaps::execute(const std::string &modelId, double startTime, double endTime, double outputInterval)
+{
+    std::string response;
+    if (mModels.count(modelId) != 1)
+    {
+        response = "The requested model does not exist: " + modelId;
+        return response;
+    }
+    CellmlSimulator* model = mModels[modelId];
+    model->resetIntegrator();
+    // make sure we are at the start time
+    model->simulateModelOneStep(startTime);
+    Json::Value root; // to store the results
+    for (double time = startTime; time <= endTime; time += outputInterval)
+    {
+        model->simulateModelOneStep(outputInterval);
+        // dump out the variable values to the terminal
+        std::vector<double> vec = model->getModelOutputs();
+        for (const auto& i: mOutputMaps[modelId])
+        {
+            std::cout << vec[i] << "\t";
+        }
+        //for (const auto& v: vec) std::cout << v << "\t";
+        std::cout << std::endl;
+    }
+    root["returnCode"] = 0;
+    response = Json::FastWriter().write(root);
+    return response;
+}
+

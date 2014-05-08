@@ -318,6 +318,19 @@ std::string API::handleBiomapsRequest(const std::string& url, const std::map<std
     else if (action == "execute")
     {
         // perform the simulation (and get output?)
+        // we expect a URL like: http://localhost:8888/execute/b1024?start=0&end=100&interval=0.1
+        if (argvals.count("start") + argvals.count("end") + argvals.count("interval") != 3)
+        {
+            std::cerr << "Expecting to find a start, end, and interval arguments in the URL!" << std::endl;
+            getInvalidResponse(response);
+        }
+        else
+        {
+            double startTime = atof(argvals.at("start").c_str());
+            double endTime = atof(argvals.at("end").c_str());
+            double outputInterval = atof(argvals.at("interval").c_str());
+            response = biomaps->execute(strings[0], startTime, endTime, outputInterval);
+        }
     }
     else
     {

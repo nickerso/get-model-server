@@ -65,6 +65,15 @@ public:
     std::string setVariableValue(const std::string& modelId, const std::string& componentName,
                                  const std::string& variableName, double value);
 
+    /**
+     * Perform the actual simulation over the specified time interval.
+     * @param modelId The indentifier for the model to simulate.
+     * @param startTime The start time for the integration.
+     * @param endTime The end time of the integration.
+     * @param outputInterval The time step resolution at which output is desired.
+     * @return A JSON structure containing the simluation results for the previously defined output variables.
+     */
+    std::string execute(const std::string& modelId, double startTime, double endTime, double outputInterval);
 private:
     Biomaps();
     std::string mRepositoryRoot;
