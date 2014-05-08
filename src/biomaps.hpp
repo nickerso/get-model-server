@@ -19,6 +19,18 @@ public:
      */
     std::string loadModel(const std::string& url);
 
+    /**
+     * Flag the given variable in the specified model as a desired output. Only variables exposed at the
+     * top level of a CellML model can be flagged.
+     * @param modelId The identifier of the model to be used.
+     * @param componentName The CellML component name containing the variable to be flagged.
+     * @param variableName The name of the CellML variable to be flagged.
+     * @param columnIndex The index column to store this variable's value in the output array. First column is 1.
+     * @return A JSON object containing a return code of 0 on success, non-zero on failure.
+     */
+    std::string flagOutput(const std::string& modelId, const std::string& componentName,
+                           const std::string& variableName, int columnIndex);
+
 private:
     Biomaps();
     std::string mRepositoryRoot;

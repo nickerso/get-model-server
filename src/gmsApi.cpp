@@ -233,12 +233,13 @@ std::string API::handleBiomapsRequest(const std::string& url, const std::map<std
     if (biomaps) std::cout << "Managed to get a biomaps manager object" << std::endl;
 
     std::string action = ""; // no default action
+    std::vector<std::string> strings;
     if (trailer.size() != 0)
     {
-        std::vector<std::string> strings;
         strings = splitString(trailer, '/', strings);
         for (auto s=strings.begin(); s!=strings.end(); ++s) std::cout << "URL part: " << *s << std::endl;
         action = strings[0];
+        strings.erase(strings.begin());
         std::cout << "Found an action to perform: " << action << std::endl;
     }
     if (action == "load")
@@ -254,6 +255,20 @@ std::string API::handleBiomapsRequest(const std::string& url, const std::map<std
     else if (action == "flag-output")
     {
         // flag the given variable as an output variable
+        /* we expect the URL following the action to be in the format <model ID>/<component name>/<variable name>
+         * and to have an argument with the column index
+         * e.g., http://localhost:8888/flag-output/b1024/environment/time?column=1
+         */
+        if (argvals.count("column") != 1)
+        {
+            std::cerr << "Expecting to find a column index in the URL arguments!" << std::endl;
+            getInvalidResponse(response);
+        }
+        else
+        {
+            int columnIndex = atoi(argvals.at("column").c_str());
+            response = biomaps->flagOutput(strings[0], strings[1], strings[2], columnIndex);
+        }
     }
     else if (action == "reset")
     {
