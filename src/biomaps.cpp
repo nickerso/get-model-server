@@ -58,3 +58,26 @@ std::string Biomaps::loadModel(const std::string &url)
     response = Json::FastWriter().write(root);
     return response;
 }
+
+std::string Biomaps::flagOutput(const std::string &modelId, const std::string &componentName,
+                                const std::string &variableName, int columnIndex)
+{
+    std::string response;
+    if (mModels.count(modelId) != 1)
+    {
+        response = "The requested model does not exist: " + modelId;
+        return response;
+    }
+    CellmlSimulator* model = mModels[modelId];
+    std::string variableId = componentName + ".";
+    variableId += variableName;
+    Json::Value root;
+    root["returnCode"] = model->addOutputVariable(variableId, columnIndex);
+    if (root["returnCode"] != 0)
+    {
+        std::cerr << "Error setting " << componentName << "/" << variableName << ", from model: "
+                  << modelId << "; to be an output variable" << std::endl;
+    }
+    response = Json::FastWriter().write(root);
+    return response;
+}
