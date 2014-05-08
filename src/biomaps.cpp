@@ -96,3 +96,33 @@ std::string Biomaps::compileModel(const std::string& modelId)
     response = Json::FastWriter().write(root);
     return response;
 }
+
+std::string Biomaps::saveModelCheckpoint(const std::string& modelId)
+{
+    std::string response;
+    Json::Value root;
+    if (mModels.count(modelId) != 1)
+    {
+        response = "The requested model does not exist: " + modelId;
+        return response;
+    }
+    CellmlSimulator* model = mModels[modelId];
+    root["returnCode"] = model->checkpointModelValues();
+    response = Json::FastWriter().write(root);
+    return response;
+}
+
+std::string Biomaps::loadModelCheckpoint(const std::string& modelId)
+{
+    std::string response;
+    Json::Value root;
+    if (mModels.count(modelId) != 1)
+    {
+        response = "The requested model does not exist: " + modelId;
+        return response;
+    }
+    CellmlSimulator* model = mModels[modelId];
+    root["returnCode"] = model->updateModelFromCheckpoint();
+    response = Json::FastWriter().write(root);
+    return response;
+}
