@@ -281,9 +281,25 @@ std::string API::handleBiomapsRequest(const std::string& url, const std::map<std
             getInvalidResponse(response);
         }
     }
-    else if (action == "reset")
+    else if (action == "save-checkpoint")
     {
-        // reset model back to initial state
+        // save the current state of the model
+        if (strings.size() == 1) response = biomaps->saveModelCheckpoint(strings[0]);
+        else
+        {
+            std::cerr << "Expecting a model ID to save checkpoint: " << url << std::endl;
+            getInvalidResponse(response);
+        }
+    }
+    else if (action == "load-checkpoint")
+    {
+        // reset the current state of the model back to the saved checkpoint
+        if (strings.size() == 1) response = biomaps->loadModelCheckpoint(strings[0]);
+        else
+        {
+            std::cerr << "Expecting a model ID to load checkpoint: " << url << std::endl;
+            getInvalidResponse(response);
+        }
     }
     else if (action == "execute")
     {

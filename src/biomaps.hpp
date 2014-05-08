@@ -39,6 +39,20 @@ public:
      */
     std::string compileModel(const std::string& modelId);
 
+    /**
+     * Save the current state of the model as a checkpoint that we can come back to.
+     * @param modelId The identifier of the model to checkpoint.
+     * @return A JSON object containing a return code of 0 on success.
+     */
+    std::string saveModelCheckpoint(const std::string& modelId);
+
+    /**
+     * Reset the current state of the model back to the state previously saved as a checkpoint.
+     * @param modelId The identifier of the model to reset.
+     * @return A JSON object containing a return code of 0 on success.
+     */
+    std::string loadModelCheckpoint(const std::string& modelId);
+
 private:
     Biomaps();
     std::string mRepositoryRoot;
