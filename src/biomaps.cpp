@@ -50,8 +50,13 @@ std::string Biomaps::loadModel(const std::string &url)
     }
     // create the dummy simulation description - why?
     csim->createSimulationDefinition();
+    // and set all variables as outputs, so that we get the variable mappings (see:
+    // https://code.google.com/p/cellml-simulator/issues/detail?id=6
+    csim->setAllVariablesOutput();
     // store the model for future use.
     mModels[bid] = csim;
+    // and initialise the output map
+    mOutputMaps[bid] = std::vector<int>();
     Json::Value root;
     // load the model
     root["id"] = bid;
@@ -62,6 +67,8 @@ std::string Biomaps::loadModel(const std::string &url)
 std::string Biomaps::flagOutput(const std::string &modelId, const std::string &componentName,
                                 const std::string &variableName, int columnIndex)
 {
+    // due to https://code.google.com/p/cellml-simulator/issues/detail?id=6 we need to map desired outputs
+    // to the actual outputs.
     std::string response;
     if (mModels.count(modelId) != 1)
     {
@@ -71,8 +78,21 @@ std::string Biomaps::flagOutput(const std::string &modelId, const std::string &c
     CellmlSimulator* model = mModels[modelId];
     std::string variableId = componentName + ".";
     variableId += variableName;
+    std::vector<std::string> variables = model->getModelVariables();
+    if (mOutputMaps[modelId].size() < columnIndex+1) mOutputMaps[modelId].resize(columnIndex+1);
+    int i = 0;
+    for (auto v=variables.begin(); v!=variables.end(); ++i, ++v)
+    {
+        if (*v == variableId)
+        {
+            mOutputMaps[modelId].at(columnIndex) = i;
+            break;
+        }
+    }
     Json::Value root;
-    root["returnCode"] = model->addOutputVariable(variableId, columnIndex);
+    // this doesn't work, see above
+    // root["returnCode"] = model->addOutputVariable(variableId, columnIndex);
+    root["returnCode"] = 0;
     if (root["returnCode"] != 0)
     {
         std::cerr << "Error setting " << componentName << "/" << variableName << ", from model: "
@@ -123,6 +143,31 @@ std::string Biomaps::loadModelCheckpoint(const std::string& modelId)
     }
     CellmlSimulator* model = mModels[modelId];
     root["returnCode"] = model->updateModelFromCheckpoint();
+    if (root["returnCode"] == 0) model->resetIntegrator(); // is this necessary?
     response = Json::FastWriter().write(root);
     return response;
 }
+
+std::string Biomaps::setVariableValue(const std::string &modelId, const std::string &componentName,
+                                      const std::string &variableName, double value)
+{
+    std::string response;
+    if (mModels.count(modelId) != 1)
+    {
+        response = "The requested model does not exist: " + modelId;
+        return response;
+    }
+    CellmlSimulator* model = mModels[modelId];
+    std::string variableId = componentName + ".";
+    variableId += variableName;
+    Json::Value root;
+    root["returnCode"] = model->setVariableValue(variableId, value);
+    if (root["returnCode"] != 0)
+    {
+        std::cerr << "Error setting value for " << componentName << "/" << variableName << ", from model: "
+                  << modelId << "; id: " << variableId << std::endl;
+    }
+    response = Json::FastWriter().write(root);
+    return response;
+}
+

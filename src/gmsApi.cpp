@@ -251,6 +251,20 @@ std::string API::handleBiomapsRequest(const std::string& url, const std::map<std
     else if (action == "set-value")
     {
         // set the given variable values for the specified model
+        /* we expect the URL following the action to be in the format <model ID>/<component name>/<variable name>
+         * and to have an argument with the value to set
+         * e.g., http://localhost:8888/set-value/b1024/environment/time?value=2.45
+         */
+        if (argvals.count("value") != 1)
+        {
+            std::cerr << "Expecting to find a variable value in the URL arguments!" << std::endl;
+            getInvalidResponse(response);
+        }
+        else
+        {
+            double value = atof(argvals.at("value").c_str());
+            response = biomaps->setVariableValue(strings[0], strings[1], strings[2], value);
+        }
     }
     else if (action == "flag-output")
     {

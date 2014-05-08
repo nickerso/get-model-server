@@ -25,7 +25,7 @@ public:
      * @param modelId The identifier of the model to be used.
      * @param componentName The CellML component name containing the variable to be flagged.
      * @param variableName The name of the CellML variable to be flagged.
-     * @param columnIndex The index column to store this variable's value in the output array. First column is 1.
+     * @param columnIndex The index column to store this variable's value in the output array. First column is 0.
      * @return A JSON object containing a return code of 0 (always succeeds even if it shouldn't).
      */
     std::string flagOutput(const std::string& modelId, const std::string& componentName,
@@ -53,10 +53,23 @@ public:
      */
     std::string loadModelCheckpoint(const std::string& modelId);
 
+    /**
+     * Set the value of the given variable in the specified model. Only variables exposed at the
+     * top level of a CellML model can be set in this manner.
+     * @param modelId The identifier of the model to be used.
+     * @param componentName The CellML component name containing the variable to be flagged.
+     * @param variableName The name of the CellML variable to be flagged.
+     * @param value The value to set this variable to.
+     * @return A JSON object containing a return code of 0 on success.
+     */
+    std::string setVariableValue(const std::string& modelId, const std::string& componentName,
+                                 const std::string& variableName, double value);
+
 private:
     Biomaps();
     std::string mRepositoryRoot;
     std::map<std::string, CellmlSimulator*> mModels;
+    std::map<std::string, std::vector<int> > mOutputMaps;
 };
 
 #endif // BIOMAPS_HPP
