@@ -179,24 +179,22 @@ std::string Biomaps::execute(const std::string &modelId, double startTime, doubl
         response = "The requested model does not exist: " + modelId;
         return response;
     }
+    Json::Value root; // to store the results
     CellmlSimulator* model = mModels[modelId];
     model->resetIntegrator();
     // make sure we are at the start time
-    model->simulateModelOneStep(startTime);
-    Json::Value root; // to store the results
+    if (startTime > outputInterval) model->simulateModelOneStep(startTime);
+    std::vector<double> data = model->getModelOutputs();
+    int col = 0;
+    int row = 0;
+    for (const auto& i: mOutputMaps[modelId]) root["data"][col++][row] = data[i];
     for (double time = startTime; time <= endTime; time += outputInterval)
     {
         model->simulateModelOneStep(outputInterval);
-        // dump out the variable values to the terminal
-        std::vector<double> vec = model->getModelOutputs();
-        for (const auto& i: mOutputMaps[modelId])
-        {
-            std::cout << vec[i] << "\t";
-        }
-        //for (const auto& v: vec) std::cout << v << "\t";
-        std::cout << std::endl;
+        data = model->getModelOutputs();
+        col = 0; row++;
+        for (const auto& i: mOutputMaps[modelId]) root["data"][col++][row] = data[i];
     }
-    root["returnCode"] = 0;
     response = Json::FastWriter().write(root);
     return response;
 }
