@@ -81,3 +81,18 @@ std::string Biomaps::flagOutput(const std::string &modelId, const std::string &c
     response = Json::FastWriter().write(root);
     return response;
 }
+
+std::string Biomaps::compileModel(const std::string& modelId)
+{
+    std::string response;
+    Json::Value root;
+    if (mModels.count(modelId) != 1)
+    {
+        response = "The requested model does not exist: " + modelId;
+        return response;
+    }
+    CellmlSimulator* model = mModels[modelId];
+    root["returnCode"] = model->compileModel();
+    response = Json::FastWriter().write(root);
+    return response;
+}

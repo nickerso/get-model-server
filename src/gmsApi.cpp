@@ -270,6 +270,17 @@ std::string API::handleBiomapsRequest(const std::string& url, const std::map<std
             response = biomaps->flagOutput(strings[0], strings[1], strings[2], columnIndex);
         }
     }
+    else if (action == "compile")
+    {
+        // once the simulation outputs are set we can compile the model (needs to be done prior
+        // to setting any variable values).
+        if (strings.size() == 1) response = biomaps->compileModel(strings[0]);
+        else
+        {
+            std::cerr << "Expecting a model ID to compile: " << url << std::endl;
+            getInvalidResponse(response);
+        }
+    }
     else if (action == "reset")
     {
         // reset model back to initial state

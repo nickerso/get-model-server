@@ -26,10 +26,18 @@ public:
      * @param componentName The CellML component name containing the variable to be flagged.
      * @param variableName The name of the CellML variable to be flagged.
      * @param columnIndex The index column to store this variable's value in the output array. First column is 1.
-     * @return A JSON object containing a return code of 0 on success, non-zero on failure.
+     * @return A JSON object containing a return code of 0 (always succeeds even if it shouldn't).
      */
     std::string flagOutput(const std::string& modelId, const std::string& componentName,
                            const std::string& variableName, int columnIndex);
+
+    /**
+     * Once the outputs for a model are specified we can compile it into an executable simulation. This needs
+     * to be done prior to setting any variable values.
+     * @param modelId The identifier for the model to compile.
+     * @return A JSON object containing a return code of 0 on success, non-zero on failure.
+     */
+    std::string compileModel(const std::string& modelId);
 
 private:
     Biomaps();
