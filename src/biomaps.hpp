@@ -32,14 +32,6 @@ public:
                            const std::string& variableName, int columnIndex);
 
     /**
-     * Once the outputs for a model are specified we can compile it into an executable simulation. This needs
-     * to be done prior to setting any variable values.
-     * @param modelId The identifier for the model to compile.
-     * @return A JSON object containing a return code of 0 on success, non-zero on failure.
-     */
-    std::string compileModel(const std::string& modelId);
-
-    /**
      * Save the current state of the model as a checkpoint that we can come back to.
      * @param modelId The identifier of the model to checkpoint.
      * @return A JSON object containing a return code of 0 on success.
