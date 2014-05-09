@@ -53,6 +53,8 @@ std::string Biomaps::loadModel(const std::string &url)
     // and set all variables as outputs, so that we get the variable mappings (see:
     // https://code.google.com/p/cellml-simulator/issues/detail?id=6
     csim->setAllVariablesOutput();
+    // and since we have all variables as outputs we can even compile the model here
+    csim->compileModel();
     // store the model for future use.
     mModels[bid] = csim;
     // and initialise the output map
@@ -98,21 +100,6 @@ std::string Biomaps::flagOutput(const std::string &modelId, const std::string &c
         std::cerr << "Error setting " << componentName << "/" << variableName << ", from model: "
                   << modelId << "; to be an output variable" << std::endl;
     }
-    response = Json::FastWriter().write(root);
-    return response;
-}
-
-std::string Biomaps::compileModel(const std::string& modelId)
-{
-    std::string response;
-    Json::Value root;
-    if (mModels.count(modelId) != 1)
-    {
-        response = "The requested model does not exist: " + modelId;
-        return response;
-    }
-    CellmlSimulator* model = mModels[modelId];
-    root["returnCode"] = model->compileModel();
     response = Json::FastWriter().write(root);
     return response;
 }
