@@ -32,6 +32,8 @@ namespace GMS
         void getInvalidResponse(std::string& response);
         std::string handleModelRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
                                        GMS::Data* data);
+        std::string handleBiomapsRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
+                                         GMS::Data* data);
         std::string handleQueryRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
                                        GMS::Data* data);
         std::string handleDojoTestRequest(const std::string& url, const std::map<std::string, std::string>& argvals);
@@ -41,6 +43,7 @@ namespace GMS
         static const std::string URL_SEARCH;
         static const std::string URL_QUERY;
         static const std::string URL_DOJO_TEST; // provides some test JSON data from Dojo examples
+        static const std::string URL_BIOMAPS;
     };
 }
 #endif // GMSAPI_HPP

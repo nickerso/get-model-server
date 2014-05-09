@@ -12,6 +12,7 @@
 #include "gmsData.hpp"
 #include "dojotest.hpp"
 #include "utils.hpp"
+#include "biomaps.hpp"
 
 using namespace GMS;
 
@@ -29,6 +30,7 @@ const std::string API::URL_MODEL = "/models/";
 const std::string API::URL_QUERY = "/query";
 const std::string API::URL_SEARCH = "/search";
 const std::string API::URL_DOJO_TEST = "/dojo-test";
+const std::string API::URL_BIOMAPS = "/biomaps";
 
 std::string API::executeAPI(const std::string& url, const std::map<std::string, std::string>& argvals,
                             GMS::Data *data)
@@ -56,6 +58,13 @@ std::string API::executeAPI(const std::string& url, const std::map<std::string, 
     if ((urlTest == URL_SEARCH) || (urlTest == URL_QUERY))
     {
         return handleQueryRequest(url, argvals, data);
+    }
+
+    // a hack to get something working like biomaps needs
+    child = urlChildOf(url, URL_BIOMAPS);
+    if (child.size() > 0)
+    {
+        return handleBiomapsRequest(url, argvals, data);
     }
 
 #if 0
@@ -210,6 +219,137 @@ std::string API::handleModelRequest(const std::string& url, const std::map<std::
         std::cerr << "Unable to handle model request with args: " << url.c_str() << std::endl;
         getInvalidResponse(response);
     }
+    return response;
+}
+
+std::string API::handleBiomapsRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
+                                      GMS::Data* data)
+{
+    std::cout << "\n\nhandleBiomapsRequest: " << url.c_str() << std::endl;
+    std::string response;
+    std::string trailer = urlChildOf(url, URL_BIOMAPS);
+    if (trailer[0] == '/') trailer.erase(trailer.begin());
+    Biomaps* biomaps = data->getBiomaps();
+    if (biomaps) std::cout << "Managed to get a biomaps manager object" << std::endl;
+
+    std::string action = ""; // no default action
+    std::vector<std::string> strings;
+    if (trailer.size() != 0)
+    {
+        strings = splitString(trailer, '/', strings);
+        for (auto s=strings.begin(); s!=strings.end(); ++s) std::cout << "URL part: " << *s << std::endl;
+        action = strings[0];
+        strings.erase(strings.begin());
+        std::cout << "Found an action to perform: " << action << std::endl;
+    }
+    if (action == "load")
+    {
+        // load a model and return its ID
+        std::string modelUrl = urlChildOf(trailer, "load/");
+        response = biomaps->loadModel(modelUrl);
+    }
+    else if (action == "set-value")
+    {
+        // set the given variable values for the specified model
+        /* we expect the URL following the action to be in the format <model ID>/<component name>/<variable name>
+         * and to have an argument with the value to set
+         * e.g., http://localhost:8888/set-value/b1024/environment/time?value=2.45
+         */
+        if (argvals.count("value") != 1)
+        {
+            std::cerr << "Expecting to find a variable value in the URL arguments!" << std::endl;
+            getInvalidResponse(response);
+        }
+        else
+        {
+            double value = atof(argvals.at("value").c_str());
+            response = biomaps->setVariableValue(strings[0], strings[1], strings[2], value);
+        }
+    }
+    else if (action == "flag-output")
+    {
+        // flag the given variable as an output variable
+        /* we expect the URL following the action to be in the format <model ID>/<component name>/<variable name>
+         * and to have an argument with the column index
+         * e.g., http://localhost:8888/flag-output/b1024/environment/time?column=1
+         */
+        if (argvals.count("column") != 1)
+        {
+            std::cerr << "Expecting to find a column index in the URL arguments!" << std::endl;
+            getInvalidResponse(response);
+        }
+        else
+        {
+            int columnIndex = atoi(argvals.at("column").c_str());
+            response = biomaps->flagOutput(strings[0], strings[1], strings[2], columnIndex);
+        }
+    }
+    else if (action == "compile")
+    {
+        // once the simulation outputs are set we can compile the model (needs to be done prior
+        // to setting any variable values).
+        if (strings.size() == 1) response = biomaps->compileModel(strings[0]);
+        else
+        {
+            std::cerr << "Expecting a model ID to compile: " << url << std::endl;
+            getInvalidResponse(response);
+        }
+    }
+    else if (action == "save-checkpoint")
+    {
+        // save the current state of the model
+        if (strings.size() == 1) response = biomaps->saveModelCheckpoint(strings[0]);
+        else
+        {
+            std::cerr << "Expecting a model ID to save checkpoint: " << url << std::endl;
+            getInvalidResponse(response);
+        }
+    }
+    else if (action == "load-checkpoint")
+    {
+        // reset the current state of the model back to the saved checkpoint
+        if (strings.size() == 1) response = biomaps->loadModelCheckpoint(strings[0]);
+        else
+        {
+            std::cerr << "Expecting a model ID to load checkpoint: " << url << std::endl;
+            getInvalidResponse(response);
+        }
+    }
+    else if (action == "execute")
+    {
+        // perform the simulation (and get output?)
+        // we expect a URL like: http://localhost:8888/execute/b1024?start=0&end=100&interval=0.1
+        if (argvals.count("start") + argvals.count("end") + argvals.count("interval") != 3)
+        {
+            std::cerr << "Expecting to find a start, end, and interval arguments in the URL!" << std::endl;
+            getInvalidResponse(response);
+        }
+        else
+        {
+            double startTime = atof(argvals.at("start").c_str());
+            double endTime = atof(argvals.at("end").c_str());
+            double outputInterval = atof(argvals.at("interval").c_str());
+            response = biomaps->execute(strings[0], startTime, endTime, outputInterval);
+        }
+    }
+    else
+    {
+        // unhandled biomaps request
+        std::cerr << "Unable to handle biomaps request: " << url.c_str() << std::endl;
+        getInvalidResponse(response);
+    }
+
+    /*for(auto iter=argvals.begin(); iter!=argvals.end(); ++iter)
+    {
+        std::cout << "args:: key(" << iter->first << ") -> value(" << iter->second << ")" << std::endl;
+    }
+    else if (!argvals.empty())
+    {
+        // FIXME: type is the only argument we currently handle.
+        if (argvals.count("type")) response = data->serialiseModelsOfType(argvals.at("type"));
+        else getInvalidResponse(response);
+    }*/
+
     return response;
 }
 
