@@ -58,7 +58,8 @@ public:
                                  const std::string& variableName, double value);
 
     /**
-     * Perform the actual simulation over the specified time interval.
+     * Perform the actual simulation over the specified time interval. No resetting is done, the simulation
+     * will simply continue from its current state.
      * @param modelId The indentifier for the model to simulate.
      * @param startTime The start time for the integration.
      * @param endTime The end time of the integration.
