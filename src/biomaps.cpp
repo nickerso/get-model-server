@@ -55,6 +55,8 @@ std::string Biomaps::loadModel(const std::string &url)
     csim->setAllVariablesOutput();
     // and since we have all variables as outputs we can even compile the model here
     csim->compileModel();
+    // and save the initial checkpoint
+    csim->checkpointModelValues();
     // store the model for future use.
     mModels[bid] = csim;
     // and initialise the output map
@@ -168,9 +170,6 @@ std::string Biomaps::execute(const std::string &modelId, double startTime, doubl
     }
     Json::Value root; // to store the results
     CellmlSimulator* model = mModels[modelId];
-    model->resetIntegrator();
-    // make sure we are at the start time
-    if (startTime > outputInterval) model->simulateModelOneStep(startTime);
     std::vector<double> data = model->getModelOutputs();
     int col = 0;
     int row = 0;
