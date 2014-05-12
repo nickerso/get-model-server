@@ -83,7 +83,7 @@ std::string Biomaps::flagOutput(const std::string &modelId, const std::string &c
     std::string variableId = componentName + ".";
     variableId += variableName;
     std::vector<std::string> variables = model->getModelVariables();
-    if (mOutputMaps[modelId].size() < columnIndex+1) mOutputMaps[modelId].resize(columnIndex+1);
+    if ((int)(mOutputMaps[modelId].size()) < columnIndex+1) mOutputMaps[modelId].resize(columnIndex+1);
     int i = 0;
     for (auto v=variables.begin(); v!=variables.end(); ++i, ++v)
     {
