@@ -4,14 +4,25 @@
 #include <cstdio>
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <map>
 #include <curl/curl.h>
 
+#include "gms-config.h"
 #include "gmsData.hpp"
 #include "libhttpd-utils.hpp"
 
+static void printVersion()
+{
+    std::ostringstream versionString;
+    versionString << "GMS " << GMS_VERSION_MAJOR << "." << GMS_VERSION_MINOR << "."
+                  << GMS_VERSION_PATCH;
+    std::cout << "This is GET Model Server version: " << versionString.str() << std::endl;
+}
+
 int main(int argc, char ** argv)
 {
+    printVersion();
     curl_global_init(CURL_GLOBAL_DEFAULT);
     if (argc < 3)
     {
