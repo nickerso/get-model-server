@@ -21,7 +21,12 @@ FIND_PACKAGE(LibSBML REQUIRED)
 FIND_PACKAGE(SEDML REQUIRED)
 FIND_PACKAGE(LibXml2 REQUIRED QUIET)
 
-set(PLATFORM_LIBS "curl" "xml2" "pthread" "gcrypt" "gnutls" "ltdl" "dl" "db-5.3" "pcre" "mhash" "uuid" "m" "gmp" "xslt" "yajl")
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(PLATFORM_LIBS "curl" "xml2")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set(PLATFORM_LIBS "curl" "xml2" "pthread" "gcrypt" "gnutls" "ltdl" "dl" "db-5.3" "pcre" "mhash" "uuid" "m" "gmp" "xslt" "yajl")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # Set version information in a config.h file
 set(GMS_VERSION_MAJOR "0")
