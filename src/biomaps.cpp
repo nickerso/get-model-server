@@ -192,6 +192,14 @@ std::string Biomaps::createDatasetId() const
 
 int Biomaps::setDatasetContent(const std::string& id, const std::string& jsonData)
 {
-    std::cout << "Setting the dataset: " << id << "to the content: " << jsonData << std::endl;
+    //std::cout << "Setting the dataset: " << id << "to the content: " << jsonData << std::endl;
+    Json::Value root;
+    if (!Json::Reader().parse(jsonData, root, false))
+    {
+        std::cerr << "Error parsing dataset content: " << jsonData << std::endl;
+        return -1;
+    }
+    std::string bob = Json::FastWriter().write(root);
+    std::cout << "Parsed data: " << bob << std::endl;
     return 0;
 }
