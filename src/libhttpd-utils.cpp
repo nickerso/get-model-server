@@ -282,9 +282,9 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
         else
         {
             std::cout << "No more data to process?" << std::endl;
-            respdata = "{'datasetId':";
+            respdata = "{\"datasetId\": \"";
             respdata += con_info->biomapsId;
-            respdata += "}";
+            respdata += "\"}";
         }
     }
     else if (0 == strcmp(method, MHD_HTTP_METHOD_GET))
