@@ -185,3 +185,13 @@ std::string Biomaps::execute(const std::string &modelId, double startTime, doubl
     return response;
 }
 
+std::string Biomaps::createDatasetId() const
+{
+    return defineIdentifier();
+}
+
+int Biomaps::setDatasetContent(const std::string& id, const std::string& jsonData)
+{
+    std::cout << "Setting the dataset: " << id << "to the content: " << jsonData << std::endl;
+    return 0;
+}
