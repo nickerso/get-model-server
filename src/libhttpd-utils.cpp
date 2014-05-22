@@ -8,6 +8,7 @@
 
 #include "gmsData.hpp"
 #include "gmsApi.hpp"
+#include "biomaps.hpp"
 
 #define PAGE "<html><head><title>libmicrohttpd demo</title>"\
              "</head><body>libmicrohttpd demo</body></html>"
@@ -171,7 +172,8 @@ static int get_url_args(void *cls, MHD_ValueKind kind, const char *key,
  */
 struct connection_info
 {
-    std::string id;
+    std::string biomapsId;
+    int id;
     int connectiontype;
     std::string data;
 };
@@ -184,12 +186,23 @@ static void
 request_completed (void *cls, struct MHD_Connection *connection,
                    void **con_cls, enum MHD_RequestTerminationCode toe)
 {
+    GMS::Data* data = static_cast<GMS::Data*>(cls);
     struct connection_info *con_info = (connection_info*)(*con_cls);
     if (NULL == con_info) return;
     std::cout << "Request completed, so destroy connection information object: " << con_info->id << std::endl;
     if (con_info->connectiontype == POST)
     {
-        std::cout << "Data for POST connection: " << con_info->data << std::endl;
+        //std::cout << "Data for POST connection: " << con_info->data << std::endl;
+        if (con_info->biomapsId.size() > 0)
+        {
+            if (data)
+            {
+                Biomaps* biomaps = data->getBiomaps();
+                if (biomaps) biomaps->setDatasetContent(con_info->biomapsId, con_info->data);
+                else std::cerr << "Where is your biomaps to set the content?!" << std::endl;
+            }
+            else std::cerr << "Where is your data?!" << std::endl;
+        }
     }
     free (con_info);
     *con_cls = NULL;
@@ -225,9 +238,8 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
         con_info = (connection_info*) malloc (sizeof (struct connection_info));
         if (NULL == con_info) return MHD_NO;
         static int idCounter = 1;
-        std::ostringstream oss;
-        oss << idCounter++;
-        con_info->id = "connection_" + oss.str();
+        con_info->id = idCounter++;
+        con_info->biomapsId = "";
         if (0 == strcmp (method, MHD_HTTP_METHOD_POST))
         {
             std::cout << "Setting up con_cls for POST: " << con_info->id << std::endl;
@@ -240,6 +252,9 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
                 free (con_info);
                 return MHD_NO;
             }
+            Biomaps* biomaps = data->getBiomaps();
+            if (biomaps) con_info->biomapsId = biomaps->createDatasetId();
+            else std::cerr << "Where is you Biomaps manager?!" << std::endl;
             con_info->data = "";
             con_info->connectiontype = POST;
         }
@@ -257,17 +272,19 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
         if (*upload_data_size != 0)
         {
             std::cout << "Processed some data: " << *upload_data_size << std::endl;
-            std::cout << "Data: " << upload_data << std::endl;
+            //std::cout << "Data: " << upload_data << std::endl;
             std::string bob(upload_data, *upload_data_size);
             con_info->data += bob;
-            std::cout << "con_info->data: " << con_info->data << std::endl;
+            //std::cout << "con_info->data: " << con_info->data << std::endl;
             *upload_data_size = 0; // set to 0 to indicate all data considered/handled.
             return MHD_YES;
         }
         else
         {
             std::cout << "No more data to process?" << std::endl;
-            respdata = "{'bob': [1,2,3], 'fred': 'this is fred'}";
+            respdata = "{'datasetId':";
+            respdata += con_info->biomapsId;
+            respdata += "}";
         }
     }
     else if (0 == strcmp(method, MHD_HTTP_METHOD_GET))
@@ -335,7 +352,7 @@ int startServer(int port, const char* serverType, GMS::Data* data)
         d = MHD_start_daemon(MHD_USE_SELECT_INTERNALLY, port, NULL, NULL,
                              &url_handler, static_cast<void*>(data),
                              MHD_OPTION_NOTIFY_COMPLETED, request_completed,
-                             NULL, MHD_OPTION_END);
+                             static_cast<void*>(data), MHD_OPTION_END);
     }
     if (d == NULL)
         return 1;

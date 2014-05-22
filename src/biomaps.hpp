@@ -67,11 +67,27 @@ public:
      * @return A JSON structure containing the simluation results for the previously defined output variables.
      */
     std::string execute(const std::string& modelId, double startTime, double endTime, double outputInterval);
+
+    /**
+     * Create a new unique identifier for a dataset that will be used as a parameter value when running
+     * a simulation.
+     * @return The new identifier.
+     */
+    std::string createDatasetId() const;
+
+    /**
+     * Populate the content of the given dataset from a JSON string.
+     * @param id The identity of the dataset to set the content of.
+     * @param jsonData A string representation of the JSON data defining this dataset.
+     * @return zero on success.
+     */
+    int setDatasetContent(const std::string& id, const std::string& jsonData);
 private:
     Biomaps();
     std::string mRepositoryRoot;
     std::map<std::string, CellmlSimulator*> mModels;
     std::map<std::string, std::vector<int> > mOutputMaps;
+    std::map<std::string, std::vector<std::pair<double, double> > > mDatasets;
 };
 
 #endif // BIOMAPS_HPP
