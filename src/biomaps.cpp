@@ -210,7 +210,7 @@ int Biomaps::setDatasetContent(const std::string& id, const std::string& jsonDat
     const Json::Value time = root["time"];
     const Json::Value value = root["value"];
     (mDatasets[id]).resize(time.size());
-    for ( int index = 0; index < time.size(); ++index )  // Iterates over the sequence elements.
+    for ( unsigned int index = 0; index < time.size(); ++index )  // Iterates over the sequence elements.
     {
         (mDatasets[id])[index] = std::pair<double, double>(time[index].asDouble(), value[index].asDouble());
         std::cout << index << "time: " << time[index].asDouble() << "; value: " << value[index].asDouble()
