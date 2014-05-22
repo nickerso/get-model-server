@@ -192,14 +192,29 @@ std::string Biomaps::createDatasetId() const
 
 int Biomaps::setDatasetContent(const std::string& id, const std::string& jsonData)
 {
+    // clear any existing values
+    (mDatasets[id]).clear();
     //std::cout << "Setting the dataset: " << id << "to the content: " << jsonData << std::endl;
     Json::Value root;
-    if (!Json::Reader().parse(jsonData, root, false))
+    Json::Reader reader;
+    bool parsingSuccessful = reader.parse(jsonData, root);
+    if (!parsingSuccessful)
     {
-        std::cerr << "Error parsing dataset content: " << jsonData << std::endl;
+        // report to the user the failure and their locations in the document.
+        std::cerr  << "Failed to parse configuration\n"
+                   << reader.getFormattedErrorMessages();
         return -1;
     }
     std::string bob = Json::FastWriter().write(root);
     std::cout << "Parsed data: " << bob << std::endl;
+    const Json::Value time = root["time"];
+    const Json::Value value = root["value"];
+    (mDatasets[id]).resize(time.size());
+    for ( int index = 0; index < time.size(); ++index )  // Iterates over the sequence elements.
+    {
+        (mDatasets[id])[index] = std::pair<double, double>(time[index].asDouble(), value[index].asDouble());
+        std::cout << index << "time: " << time[index].asDouble() << "; value: " << value[index].asDouble()
+                  << std::endl;
+    }
     return 0;
 }
