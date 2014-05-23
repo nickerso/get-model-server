@@ -172,10 +172,11 @@ static int get_url_args(void *cls, MHD_ValueKind kind, const char *key,
  */
 struct connection_info
 {
-    std::string biomapsId;
+    char* biomapsId;
     int id;
     int connectiontype;
-    std::string data;
+    char* data;
+    size_t dataSize;
 };
 #define JSON_CONTENT_TYPE "application/json"
 
@@ -193,7 +194,7 @@ request_completed (void *cls, struct MHD_Connection *connection,
     if (con_info->connectiontype == POST)
     {
         //std::cout << "Data for POST connection: " << con_info->data << std::endl;
-        if (con_info->biomapsId.size() > 0)
+        if (con_info->biomapsId)
         {
             if (data)
             {
@@ -204,6 +205,8 @@ request_completed (void *cls, struct MHD_Connection *connection,
             else std::cerr << "Where is your data?!" << std::endl;
         }
     }
+    if (con_info->biomapsId) free(con_info->biomapsId);
+    if (con_info->data) free(con_info->data);
     free (con_info);
     *con_cls = NULL;
 }
@@ -239,12 +242,14 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
         if (NULL == con_info) return MHD_NO;
         static int idCounter = 1;
         con_info->id = idCounter++;
-        con_info->biomapsId = "";
+        con_info->data = NULL;
+        con_info->biomapsId = NULL;
+        con_info->dataSize = 0;
         if (0 == strcmp (method, MHD_HTTP_METHOD_POST))
         {
             std::cout << "Setting up con_cls for POST: " << con_info->id << std::endl;
-            if (0 != strcmp(MHD_lookup_connection_value(connection, MHD_HEADER_KIND, "Content-type"),
-                            JSON_CONTENT_TYPE))
+            std::string contentType(MHD_lookup_connection_value(connection, MHD_HEADER_KIND, "Content-type"));
+            if (contentType.find(JSON_CONTENT_TYPE) == std::string::npos)
             {
                 std::cerr << "Error creating POST processor?! Unhandled content type: "
                           << MHD_lookup_connection_value(connection, MHD_HEADER_KIND, "Content-type")
@@ -255,7 +260,6 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
             Biomaps* biomaps = data->getBiomaps();
             if (biomaps) con_info->biomapsId = biomaps->createDatasetId();
             else std::cerr << "Where is you Biomaps manager?!" << std::endl;
-            con_info->data = "";
             con_info->connectiontype = POST;
         }
         else con_info->connectiontype = GET;
@@ -273,8 +277,11 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
         {
             std::cout << "Processed some data: " << *upload_data_size << std::endl;
             //std::cout << "Data: " << upload_data << std::endl;
-            std::string bob(upload_data, *upload_data_size);
-            con_info->data += bob;
+            con_info->data = (char*)realloc(con_info->data, con_info->dataSize + *upload_data_size);
+            memcpy(con_info->data + con_info->dataSize, upload_data, *upload_data_size);
+            con_info->dataSize += *upload_data_size;
+            //std::string bob(upload_data, *upload_data_size);
+            //con_info->data += bob.c_str();
             //std::cout << "con_info->data: " << con_info->data << std::endl;
             *upload_data_size = 0; // set to 0 to indicate all data considered/handled.
             return MHD_YES;

@@ -1,5 +1,6 @@
 #include <string>
 #include <sstream>
+#include <cstring>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -185,9 +186,12 @@ std::string Biomaps::execute(const std::string &modelId, double startTime, doubl
     return response;
 }
 
-std::string Biomaps::createDatasetId() const
+char* Biomaps::createDatasetId() const
 {
-    return defineIdentifier();
+    std::string id = defineIdentifier();
+    char* s = (char*)malloc(id.size() + 1);
+    strcpy(s, id.c_str());
+    return s;
 }
 
 int Biomaps::setDatasetContent(const std::string& id, const std::string& jsonData)
