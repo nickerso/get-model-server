@@ -71,9 +71,9 @@ public:
     /**
      * Create a new unique identifier for a dataset that will be used as a parameter value when running
      * a simulation.
-     * @return The new identifier.
+     * @return The new identifier, the calling code is expected to free the memory returned.
      */
-    std::string createDatasetId() const;
+    char* createDatasetId() const;
 
     /**
      * Populate the content of the given dataset from a JSON string.
