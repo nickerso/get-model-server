@@ -192,6 +192,7 @@ std::string Biomaps::setVariableValue(const std::string &modelId, const std::str
     else
     {
         mDatasetVariableMap[modelId].push_back(std::pair<std::string, std::string>(variableId, datasetId));
+        mDatasetTimeOffset[modelId].push_back(std::pair<std::string, bool>(variableId, offsetDataTime));
     }
     response = Json::FastWriter().write(root);
     return response;
