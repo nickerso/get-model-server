@@ -58,6 +58,21 @@ public:
                                  const std::string& variableName, double value);
 
     /**
+     * Set the value of the given variable in the specified model. Only variables exposed at the
+     * top level of a CellML model can be set in this manner.
+     * @param modelId The identifier of the model to be used.
+     * @param componentName The CellML component name containing the variable to be flagged.
+     * @param variableName The name of the CellML variable to be flagged.
+     * @param datasetId The ID of the dataset to use to control the value of this variable.
+     * @param offsetDataTime If true, the dataset times will be offset by the start time when
+     *   executing a simulation.
+     * @return A JSON object containing a return code of 0 on success.
+     */
+    std::string setVariableValue(const std::string& modelId, const std::string& componentName,
+                                 const std::string& variableName, const std::string& datasetId,
+                                 bool offsetDataTime);
+
+    /**
      * Perform the actual simulation over the specified time interval. No resetting is done, the simulation
      * will simply continue from its current state.
      * @param modelId The indentifier for the model to simulate.
@@ -88,6 +103,8 @@ private:
     std::map<std::string, CellmlSimulator*> mModels;
     std::map<std::string, std::vector<int> > mOutputMaps;
     std::map<std::string, std::vector<std::pair<double, double> > > mDatasets;
+    // MAP[ <modelID> ] ==> vector( <variableID> <datasetID> )
+    std::map<std::string, std::vector<std::pair<std::string, std::string> > > mDatasetVariableMap;
 };
 
 #endif // BIOMAPS_HPP

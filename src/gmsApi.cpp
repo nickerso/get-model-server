@@ -252,18 +252,39 @@ std::string API::handleBiomapsRequest(const std::string& url, const std::map<std
     {
         // set the given variable values for the specified model
         /* we expect the URL following the action to be in the format <model ID>/<component name>/<variable name>
-         * and to have an argument with the value to set
+         * and to have an argument with:
+         *
+         * the scalar value to set
          * e.g., http://localhost:8888/set-value/b1024/environment/time?value=2.45
+         *
+         * OR
+         *
+         * the dataset identifier to use in setting the value and an optional argument setting whether the
+         * dataset 'time' values are offset back to zero in the simulation (i.e., integrating from 10 to 20,
+         * should the times in the dataset have 10 substracted from them?) the default value is true
+         * e.g., http://localhost:8888/set-value/b1024/environment/time?dataset=b1027&offset=false
          */
-        if (argvals.count("value") != 1)
-        {
-            std::cerr << "Expecting to find a variable value in the URL arguments!" << std::endl;
-            getInvalidResponse(response);
-        }
-        else
+        if (argvals.count("value") == 1)
         {
             double value = atof(argvals.at("value").c_str());
             response = biomaps->setVariableValue(strings[0], strings[1], strings[2], value);
+        }
+        else if (argvals.count("dataset") == 1)
+        {
+            bool offsetDataTimes = true;
+            if (argvals.count("offset") == 1)
+            {
+                std::string offset = argvals.at("offset");
+                if ((offset == "true") || (offset == "TRUE") || (offset == "1")) offsetDataTimes = true;
+                else offsetDataTimes = false;
+            }
+            response = biomaps->setVariableValue(strings[0], strings[1], strings[2], argvals.at("dataset"),
+                    offsetDataTimes);
+        }
+        else
+        {
+            std::cerr << "Expecting to find a variable value in the URL arguments!" << std::endl;
+            getInvalidResponse(response);
         }
     }
     else if (action == "flag-output")
