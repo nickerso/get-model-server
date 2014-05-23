@@ -105,6 +105,8 @@ private:
     std::map<std::string, std::vector<std::pair<double, double> > > mDatasets;
     // MAP[ <modelID> ] ==> vector( <variableID> <datasetID> )
     std::map<std::string, std::vector<std::pair<std::string, std::string> > > mDatasetVariableMap;
+    // MAP[ <modelID> ] ==> vector( <variableID> <offsetDataTime> )
+    std::map<std::string, std::vector<std::pair<std::string, bool> > > mDatasetTimeOffset;
 };
 
 #endif // BIOMAPS_HPP
