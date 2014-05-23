@@ -161,6 +161,41 @@ std::string Biomaps::setVariableValue(const std::string &modelId, const std::str
     return response;
 }
 
+std::string Biomaps::setVariableValue(const std::string &modelId, const std::string &componentName,
+                                      const std::string &variableName, const std::string& datasetId,
+                                      bool offsetDataTime)
+{
+    std::string response;
+    if (mModels.count(modelId) != 1)
+    {
+        response = "The requested model does not exist: " + modelId;
+        return response;
+    }
+    if (mDatasets.count(datasetId) != 1)
+    {
+        response = "The requested dataset does not exist: " + datasetId;
+        return response;
+    }
+    std::string variableId = componentName + ".";
+    variableId += variableName;
+    // check we can set the variable value
+    auto& dataset = mDatasets[datasetId];
+    double value = dataset[0].second;
+    CellmlSimulator* model = mModels[modelId];
+    Json::Value root;
+    root["returnCode"] = model->setVariableValue(variableId, value);
+    if (root["returnCode"] != 0)
+    {
+        std::cerr << "Error setting value from dataset for " << componentName << "/" << variableName
+                  << ", from model: " << modelId << "; id: " << variableId << std::endl;
+    }
+    else
+    {
+        mDatasetVariableMap[modelId].push_back(std::pair<std::string, std::string>(variableId, datasetId));
+    }
+    response = Json::FastWriter().write(root);
+    return response;
+}
 std::string Biomaps::execute(const std::string &modelId, double startTime, double endTime, double outputInterval)
 {
     std::string response;
