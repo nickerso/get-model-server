@@ -207,12 +207,14 @@ std::string Biomaps::execute(const std::string &modelId, double startTime, doubl
     }
     Json::Value root; // to store the results
     CellmlSimulator* model = mModels[modelId];
+    setDataDrivenValues(modelId, startTime);
     std::vector<double> data = model->getModelOutputs();
     int col = 0;
     int row = 0;
     for (const auto& i: mOutputMaps[modelId]) root["data"][col++][row] = data[i];
     for (double time = startTime; time <= endTime; time += outputInterval)
     {
+        setDataDrivenValues(modelId, time);
         model->simulateModelOneStep(outputInterval);
         data = model->getModelOutputs();
         col = 0; row++;
@@ -257,4 +259,51 @@ int Biomaps::setDatasetContent(const std::string& id, const std::string& jsonDat
                   << std::endl;
     }
     return 0;
+}
+
+void Biomaps::setDataDrivenValues(const std::string& modelId, double time)
+{
+    // MAP[ <modelID> ] ==> vector( <variableID> <datasetID> )
+    //std::map<std::string, std::vector<std::pair<std::string, std::string> > > mDatasetVariableMap;
+    // MAP[ <modelID> ] ==> vector( <variableID> <offsetDataTime> )
+    //std::map<std::string, std::vector<std::pair<std::string, bool> > > mDatasetTimeOffset;
+    if (mDatasetVariableMap.count(modelId) > 0)
+    {
+        CellmlSimulator* model = mModels.at(modelId);
+        const auto& variables = mDatasetVariableMap.at(modelId);
+        for (const auto& v: variables)
+        {
+            //std::cout << "Model ID: " << modelId << "; Variable ID: " << v.first << "; dataset: "
+            //          << v.second << std::endl;
+            double value = getDataValue(v.second, time);
+            model->setVariableValue(v.first, value);
+        }
+    }
+}
+
+double Biomaps::getDataValue(const std::string &datasetId, double time) const
+{
+    double value = 0; // resonable default?
+    //std::map<std::string, std::vector<std::pair<double, double> > > mDatasets;
+    if (mDatasets.count(datasetId) == 1)
+    {
+        const auto& values = mDatasets.at(datasetId);
+        int index = 0;
+        for (const auto& v: values)
+        {
+            if (v.first < time) ++index;
+            else break;
+        }
+        double t1 = values[index-1].first;
+        double t2 = values[index].first;
+        double v1 = values[index-1].second;
+        double v2 = values[index].second;
+        // linear interpolation
+        double xi = (time - t1) / (t2 - t1);
+        value = (1.0 - xi) * v1 + xi * v2;
+        std::cout << "index: " << index << "; t1: " << t1 << "; t2: " << t2
+                  << "; v1: " << v1 << "; v2: " << v2 << std::endl;
+        std::cout << "xi: " << xi << "; value: " << value << std::endl;
+    }
+    return value;
 }

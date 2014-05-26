@@ -99,6 +99,20 @@ public:
     int setDatasetContent(const std::string& id, const std::string& jsonData);
 private:
     Biomaps();
+    /**
+     * Set the values for the variables controlled via a dataset.
+     * @param modelId The identifier for the model of interest.
+     * @param time The current time to set the value for.
+     */
+    void setDataDrivenValues(const std::string &modelId, double time);
+    /**
+     * Get a value from the given dataset at the specified time.
+     * @todo Need to allow for different types of interpolation and offsets.
+     * @param datasetId The identity of the dataset to obtain the value from.
+     * @param time The time at which the value of the dataset is desired.
+     * @return The requested value.
+     */
+    double getDataValue(const std::string& datasetId, double time) const;
     std::string mRepositoryRoot;
     std::map<std::string, CellmlSimulator*> mModels;
     std::map<std::string, std::vector<int> > mOutputMaps;
