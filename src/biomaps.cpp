@@ -294,16 +294,23 @@ double Biomaps::getDataValue(const std::string &datasetId, double time) const
             if (v.first < time) ++index;
             else break;
         }
-        double t1 = values[index-1].first;
-        double t2 = values[index].first;
-        double v1 = values[index-1].second;
-        double v2 = values[index].second;
-        // linear interpolation
-        double xi = (time - t1) / (t2 - t1);
-        value = (1.0 - xi) * v1 + xi * v2;
-        std::cout << "index: " << index << "; t1: " << t1 << "; t2: " << t2
-                  << "; v1: " << v1 << "; v2: " << v2 << std::endl;
-        std::cout << "xi: " << xi << "; value: " << value << std::endl;
+        if (index == 0)
+        {
+            value = values[0].second;
+        }
+        else
+        {
+            double t1 = values[index-1].first;
+            double t2 = values[index].first;
+            double v1 = values[index-1].second;
+            double v2 = values[index].second;
+            // linear interpolation
+            double xi = (time - t1) / (t2 - t1);
+            value = (1.0 - xi) * v1 + xi * v2;
+            std::cout << "index: " << index << "; t1: " << t1 << "; t2: " << t2
+                      << "; v1: " << v1 << "; v2: " << v2 << std::endl;
+            std::cout << "xi: " << xi << "; value: " << value << std::endl;
+        }
     }
     return value;
 }
