@@ -31,7 +31,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 # Set version information in a config.h file
 set(GMS_VERSION_MAJOR "0")
 set(GMS_VERSION_MINOR "2")
-set(GMS_VERSION_PATCH "biomaps-1")
+set(GMS_VERSION_PATCH "biomaps-2")
 configure_file(
   "${PROJECT_SOURCE_DIR}/src/gms-config.h.in"
   "${PROJECT_BINARY_DIR}/gms-config.h"
