@@ -247,7 +247,7 @@ int Biomaps::setDatasetContent(const std::string& id, const std::string& jsonDat
                    << reader.getFormattedErrorMessages();
         return -1;
     }
-    std::string bob = Json::FastWriter().write(root);
+    //std::string bob = Json::FastWriter().write(root);
     //std::cout << "Parsed data: " << bob << std::endl;
     const Json::Value time = root["time"];
     const Json::Value value = root["value"];
