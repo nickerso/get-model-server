@@ -248,15 +248,15 @@ int Biomaps::setDatasetContent(const std::string& id, const std::string& jsonDat
         return -1;
     }
     std::string bob = Json::FastWriter().write(root);
-    std::cout << "Parsed data: " << bob << std::endl;
+    //std::cout << "Parsed data: " << bob << std::endl;
     const Json::Value time = root["time"];
     const Json::Value value = root["value"];
     (mDatasets[id]).resize(time.size());
     for ( unsigned int index = 0; index < time.size(); ++index )  // Iterates over the sequence elements.
     {
         (mDatasets[id])[index] = std::pair<double, double>(time[index].asDouble(), value[index].asDouble());
-        std::cout << index << "time: " << time[index].asDouble() << "; value: " << value[index].asDouble()
-                  << std::endl;
+        //std::cout << index << "time: " << time[index].asDouble() << "; value: " << value[index].asDouble()
+        //          << std::endl;
     }
     return 0;
 }
@@ -298,6 +298,10 @@ double Biomaps::getDataValue(const std::string &datasetId, double time) const
         {
             value = values[0].second;
         }
+        else if (index >= values.size())
+        {
+            value = (values.back()).second;
+        }
         else
         {
             double t1 = values[index-1].first;
@@ -307,9 +311,9 @@ double Biomaps::getDataValue(const std::string &datasetId, double time) const
             // linear interpolation
             double xi = (time - t1) / (t2 - t1);
             value = (1.0 - xi) * v1 + xi * v2;
-            std::cout << "index: " << index << "; t1: " << t1 << "; t2: " << t2
-                      << "; v1: " << v1 << "; v2: " << v2 << std::endl;
-            std::cout << "xi: " << xi << "; value: " << value << std::endl;
+            //std::cout << "index: " << index << "; t1: " << t1 << "; t2: " << t2
+            //          << "; v1: " << v1 << "; v2: " << v2 << std::endl;
+            //std::cout << "xi: " << xi << "; value: " << value << std::endl;
         }
     }
     return value;
