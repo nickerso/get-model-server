@@ -288,7 +288,7 @@ double Biomaps::getDataValue(const std::string &datasetId, double time) const
     if (mDatasets.count(datasetId) == 1)
     {
         const auto& values = mDatasets.at(datasetId);
-        int index = 0;
+        unsigned int index = 0;
         for (const auto& v: values)
         {
             if (v.first < time) ++index;
