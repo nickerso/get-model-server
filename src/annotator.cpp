@@ -36,7 +36,17 @@ std::string Annotator::loadSource(const std::string &url)
         return response;
     }
     mSourceDocument = new XmlDoc();
-    mSourceDocument->parseString(sourceContent);
+    if (mSourceDocument->parseString(sourceContent) != 0)
+    {
+        delete mSourceDocument;
+        mSourceDocument = NULL;
+        Json::Value root;
+        root["returnCode"] = 2;
+        response = Json::FastWriter().write(root);
+        return response;
+    }
+    // success
+    mSourceFile = url;
     Json::Value root;
     root["returnCode"] = 0;
     response = Json::FastWriter().write(root);

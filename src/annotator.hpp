@@ -20,6 +20,7 @@ private:
     Annotator();
     std::string mRepositoryRoot;
     std::string mRepositoryLocalPath;
+    std::string mSourceFile;
     XmlDoc* mSourceDocument;
 };
 
