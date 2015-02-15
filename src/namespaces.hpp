@@ -25,5 +25,11 @@
 #define MODEL_TYPE_CELL           CSIM_MODEL_TYPE_NS "/cell"
 #define MODEL_TYPE_TRANSPORTER    CSIM_MODEL_TYPE_NS "/transport-protein"
 
+#define CSIM_SIMULATION_NS "http://cellml.sourceforge.net/csim/simulation/0.1#"
+#define CSIM_SIMULATION_PREFIX "csim"
+#define OMEX_MANIFEST_NS "http://identifiers.org/combine.specifications/omex-manifest"
+#define OMEX_MANIFEST_PREFIX "omf"
+
+#define CELLML_1_1_PREFIX "cellml"
 
 #endif // NAMESPACES_HPP

@@ -16,6 +16,12 @@ public:
      */
     std::string loadSource(const std::string& url);
 
+    /**
+     * Return the list of CellML components in the current source document.
+     * @return A JSON object defining the current CellML components in the source model.
+     */
+    std::string getSourceComponents() const;
+
 private:
     Annotator();
     std::string mRepositoryRoot;
