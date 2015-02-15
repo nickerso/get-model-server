@@ -26,15 +26,20 @@ int main(int argc, char ** argv)
     curl_global_init(CURL_GLOBAL_DEFAULT);
     if (argc < 3)
     {
-        printf("%s <PORT> <echo|log|GMS> [Model Root]\n", argv[0]);
+        printf("%s <PORT> <echo|log|GMS> [Repository Root] [Repository local path]\n", argv[0]);
+        printf(" - default repository root: http://localhost:9876/models/\n");
+        printf(" - repository local path must be specified if needing to save annotations\n");
         return 1;
     }
     GMS::Data* data = new GMS::Data();
     if (0 == strcmp(argv[2], "GMS"))
     {
         std::string repositoryRoot = "http://localhost:9876/models/";
+        // hack to enable saving of annotations
+        std::string repositoryLocalPath = "";
         if (argc > 3) repositoryRoot = std::string(argv[3]);
-        int code = data->initialiseModelDatabase(repositoryRoot);
+        if (argc > 4) repositoryLocalPath = std::string(argv[4]);
+        int code = data->initialiseModelDatabase(repositoryRoot, repositoryLocalPath);
         //int code = data->initialiseModelDatabase("file:///Users/dnic019/shared-folders/projects/kidney/GeneralEpithelialTransport/www/models/");
         if (code != 0)
         {
