@@ -8,6 +8,7 @@
 class Workspace;
 class RdfGraph;
 class Biomaps;
+class Annotator;
 
 LIBSEDML_CPP_NAMESPACE_USE
 
@@ -21,7 +22,7 @@ namespace GMS
         /**
           * Initialise the database of all models we know about.
           */
-        int initialiseModelDatabase(const std::string& repositoryRoot);
+        int initialiseModelDatabase(const std::string& repositoryRoot, const std::string& repositoryLocalPath);
 
         int addWorkspace(Workspace* workspace);
 
@@ -78,6 +79,15 @@ namespace GMS
             return mBiomaps;
         }
 
+        /**
+         * Just to keep the experimental annotator code a bit separate from the rest of GMS for now.
+         * @return A pointer to the annotator manager object for this data.
+         */
+        inline Annotator* getAnnotator()
+        {
+            return mAnnotator;
+        }
+
     private:
         std::string mRepositoryRoot;
         std::vector<std::string> mModelList;
@@ -87,6 +97,7 @@ namespace GMS
         std::map<std::string, SedDocument*> mSimulationDescriptions;
         RdfGraph* mRdfGraph;
         Biomaps* mBiomaps;
+        Annotator* mAnnotator;
     };
 }
 #endif // GMSDATA_HPP

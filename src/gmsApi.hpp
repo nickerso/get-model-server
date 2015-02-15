@@ -34,6 +34,8 @@ namespace GMS
                                        GMS::Data* data);
         std::string handleBiomapsRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
                                          GMS::Data* data);
+        std::string handleAnnotatorRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
+                                           GMS::Data* data);
         std::string handleQueryRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
                                        GMS::Data* data);
         std::string handleDojoTestRequest(const std::string& url, const std::map<std::string, std::string>& argvals);
@@ -44,6 +46,7 @@ namespace GMS
         static const std::string URL_QUERY;
         static const std::string URL_DOJO_TEST; // provides some test JSON data from Dojo examples
         static const std::string URL_BIOMAPS;
+        static const std::string URL_ANNOTATOR;
     };
 }
 #endif // GMSAPI_HPP

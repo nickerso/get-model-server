@@ -13,6 +13,7 @@
 #include "dojotest.hpp"
 #include "utils.hpp"
 #include "biomaps.hpp"
+#include "annotator.hpp"
 
 using namespace GMS;
 
@@ -31,6 +32,7 @@ const std::string API::URL_QUERY = "/query";
 const std::string API::URL_SEARCH = "/search";
 const std::string API::URL_DOJO_TEST = "/dojo-test";
 const std::string API::URL_BIOMAPS = "/biomaps";
+const std::string API::URL_ANNOTATOR = "/annotator";
 
 std::string API::executeAPI(const std::string& url, const std::map<std::string, std::string>& argvals,
                             GMS::Data *data)
@@ -65,6 +67,13 @@ std::string API::executeAPI(const std::string& url, const std::map<std::string, 
     if (child.size() > 0)
     {
         return handleBiomapsRequest(url, argvals, data);
+    }
+
+    // a hack to get something working for annotation
+    child = urlChildOf(url, URL_ANNOTATOR);
+    if (child.size() > 0)
+    {
+        return handleAnnotatorRequest(url, argvals, data);
     }
 
 #if 0
@@ -359,6 +368,42 @@ std::string API::handleBiomapsRequest(const std::string& url, const std::map<std
         if (argvals.count("type")) response = data->serialiseModelsOfType(argvals.at("type"));
         else getInvalidResponse(response);
     }*/
+
+    return response;
+}
+
+std::string API::handleAnnotatorRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
+                                        GMS::Data* data)
+{
+    std::cout << "\n\nhandleAnnotatorRequest: " << url.c_str() << std::endl;
+    std::string response;
+    std::string trailer = urlChildOf(url, URL_ANNOTATOR);
+    if (trailer[0] == '/') trailer.erase(trailer.begin());
+    Annotator* annotator = data->getAnnotator();
+    if (annotator) std::cout << "Managed to get a annotation manager object" << std::endl;
+
+    std::string action = ""; // no default action
+    std::vector<std::string> strings;
+    if (trailer.size() != 0)
+    {
+        strings = splitString(trailer, '/', strings);
+        for (auto s=strings.begin(); s!=strings.end(); ++s) std::cout << "URL part: " << *s << std::endl;
+        action = strings[0];
+        strings.erase(strings.begin());
+        std::cout << "Found an action to perform: " << action << std::endl;
+    }
+    if (action == "loadSource")
+    {
+        // load the source XML document to be annotated
+        std::string sourceUrl = urlChildOf(trailer, "loadSource/");
+        response = annotator->loadSource(sourceUrl);
+    }
+    else
+    {
+        // unhandled annotator request
+        std::cerr << "Unable to handle annotator request: " << url.c_str() << std::endl;
+        getInvalidResponse(response);
+    }
 
     return response;
 }

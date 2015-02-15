@@ -12,6 +12,7 @@
 #include "rdfgraph.hpp"
 #include "namespaces.hpp"
 #include "biomaps.hpp"
+#include "annotator.hpp"
 
 using namespace GMS;
 LIBSEDML_CPP_NAMESPACE_USE
@@ -54,7 +55,7 @@ public:
 };
 
 Data::Data() :
-    mBiomaps(0)
+    mBiomaps(0), mAnnotator(0)
 {
     std::cout << "Creating new GMS::Data for use in the GET model server." << std::endl;
     mRdfGraph = new RdfGraph();
@@ -73,9 +74,10 @@ Data::~Data()
     }
     if (mRdfGraph) delete mRdfGraph;
     if (mBiomaps) delete mBiomaps;
+    if (mAnnotator) delete mAnnotator;
 }
 
-int Data::initialiseModelDatabase(const std::string &repositoryRoot)
+int Data::initialiseModelDatabase(const std::string &repositoryRoot, const std::string& repositoryLocalPath)
 {
     int code = 0;
     mRepositoryRoot = repositoryRoot;
@@ -87,11 +89,11 @@ int Data::initialiseModelDatabase(const std::string &repositoryRoot)
     // we have loaded all the RDF, so create the cache for actual use.
     mRdfGraph->cacheGraph();
 
-    /*std::cout << "Model Listing:\n";
+    std::cout << "Model Listing:\n";
     for (int i = 0; i < mModelList.size(); ++i)
     {
         std::cout << "**" << mModelList[i] << "**\n";
-    }*/
+    }
     std::cout << "Models of type: *" << std::endl;
     std::vector<std::string> models = mRdfGraph->getModelsOfType("*");
     for (auto i = models.begin(); i != models.end(); ++i) std::cout << "Model: " << i->c_str() << std::endl;
@@ -100,6 +102,9 @@ int Data::initialiseModelDatabase(const std::string &repositoryRoot)
     // since we know where the models are, we can create a biomaps manager object
     if (mBiomaps) delete mBiomaps;
     mBiomaps = new Biomaps(mRepositoryRoot);
+    // and an annotator object
+    if (mAnnotator) delete mAnnotator;
+    mAnnotator = new Annotator(mRepositoryRoot, repositoryLocalPath);
     return code;
 }
 
