@@ -53,3 +53,20 @@ std::string Annotator::loadSource(const std::string &url)
     return response;
 }
 
+std::string Annotator::getSourceComponents() const
+{
+    std::string response;
+    std::vector<std::pair<std::string, std::string> > components = mSourceDocument->getCellmlComponentList();
+    Json::Value root;
+    int j = 0;
+    for (const auto& i: components)
+    {
+        Json::Value c;
+        c["name"] = i.first;
+        c["id"] = i.second;
+        root["components"][j++] = c;
+    }
+    root["returnCode"] = 0;
+    response = Json::FastWriter().write(root);
+    return response;
+}

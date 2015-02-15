@@ -398,6 +398,11 @@ std::string API::handleAnnotatorRequest(const std::string& url, const std::map<s
         std::string sourceUrl = urlChildOf(trailer, "loadSource/");
         response = annotator->loadSource(sourceUrl);
     }
+    else if (action == "getSourceComponents")
+    {
+        // return the CellML components in the source document
+        response = annotator->getSourceComponents();
+    }
     else
     {
         // unhandled annotator request

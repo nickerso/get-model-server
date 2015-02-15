@@ -8,11 +8,7 @@
 #include "xmlDoc.hpp"
 #include "utils.hpp"
 #include "contentItem.hpp"
-
-#define CSIM_SIMULATION_NS "http://cellml.sourceforge.net/csim/simulation/0.1#"
-#define CSIM_SIMULATION_PREFIX "csim"
-#define OMEX_MANIFEST_NS "http://identifiers.org/combine.specifications/omex-manifest"
-#define OMEX_MANIFEST_PREFIX "omf"
+#include "namespaces.hpp"
 
 static xmlNodeSetPtr executeXPath(xmlDocPtr doc, const xmlChar* xpathExpr);
 
@@ -92,6 +88,36 @@ std::vector<ContentItem*> XmlDoc::processManifest()
     return items;
 }
 
+std::vector<std::pair<std::string, std::string> > XmlDoc::getCellmlComponentList()
+{
+    std::vector<std::pair<std::string, std::string> > componentList;
+    if (mXmlDocPtr == NULL)
+    {
+        std::cerr << "Can't process a source document that hasn't been loaded?!\n";
+        return componentList;
+    }
+    xmlDocPtr doc = static_cast<xmlDocPtr>(mXmlDocPtr);
+    xmlNodeSetPtr results = executeXPath(doc, BAD_CAST "/cellml:model/cellml:component");
+    if (results)
+    {
+        int i, n = xmlXPathNodeSetGetLength(results);
+        for (i = 0; i < n; ++i)
+        {
+            xmlNodePtr node = xmlXPathNodeSetItem(results, i);
+            if (node->type == XML_ELEMENT_NODE)
+            {
+                char* name = (char*)xmlGetProp(node, BAD_CAST "name");
+                char* id = (char*)xmlGetProp(node, BAD_CAST "id");
+                std::pair<std::string, std::string> p(name, id);
+                componentList.push_back(p);
+                xmlFree(name);
+                xmlFree(id);
+            }
+        }
+    }
+    return componentList;
+}
+
 static xmlNodeSetPtr executeXPath(xmlDocPtr doc, const xmlChar* xpathExpr)
 {
     xmlXPathContextPtr xpathCtx;
@@ -106,7 +132,8 @@ static xmlNodeSetPtr executeXPath(xmlDocPtr doc, const xmlChar* xpathExpr)
     }
     /* Register namespaces */
     if (!(xmlXPathRegisterNs(xpathCtx, BAD_CAST CSIM_SIMULATION_PREFIX, BAD_CAST CSIM_SIMULATION_NS) == 0) ||
-            !(xmlXPathRegisterNs(xpathCtx, BAD_CAST OMEX_MANIFEST_PREFIX, BAD_CAST OMEX_MANIFEST_NS) == 0))
+        !(xmlXPathRegisterNs(xpathCtx, BAD_CAST OMEX_MANIFEST_PREFIX, BAD_CAST OMEX_MANIFEST_NS) == 0) ||
+        !(xmlXPathRegisterNs(xpathCtx, BAD_CAST CELLML_1_1_PREFIX, BAD_CAST CELLML_1_1_NS) == 0))
     {
         fprintf(stderr, "Error: unable to register namespaces\n");
         return NULL;
