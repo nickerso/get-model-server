@@ -118,6 +118,44 @@ std::vector<std::pair<std::string, std::string> > XmlDoc::getCellmlComponentList
     return componentList;
 }
 
+int XmlDoc::createCellmlComponent(const std::string& name, const std::string& cmetaId)
+{
+    if (mXmlDocPtr == NULL)
+    {
+        std::cerr << "Can't add a component to a source document that hasn't been loaded?!\n";
+        return -1;
+    }
+    xmlDocPtr doc = static_cast<xmlDocPtr>(mXmlDocPtr);
+    xmlNodePtr root = xmlDocGetRootElement(doc);
+    xmlNsPtr* nsList = xmlGetNsList(doc, root);
+    xmlNsPtr* ns1 = nsList;
+    xmlNsPtr cellmlNs = NULL;
+    xmlNsPtr cmetaNs = NULL;
+    while (*nsList)
+    {
+        std::string href((const char*)((*nsList)->href));
+        if ((href == CELLML_1_1_NS) || (href == CELLML_1_0_NS)) cellmlNs = *nsList;
+        else if (href == CMETA_NS) cmetaNs = *nsList;
+        nsList++;
+    }
+    xmlFree(ns1);
+    xmlNodePtr node = xmlNewChild(root, /*Namespace*/cellmlNs, BAD_CAST "component", /*content*/NULL);
+    xmlSetProp(node, BAD_CAST "name", BAD_CAST name.c_str());
+    xmlSetNsProp(node, cmetaNs, BAD_CAST "id", BAD_CAST cmetaId.c_str());
+    return 0;
+}
+
+std::string XmlDoc::asString()
+{
+    xmlDocPtr doc = static_cast<xmlDocPtr>(mXmlDocPtr);
+    xmlChar *xmlbuff;
+    int buffersize;
+    xmlDocDumpFormatMemory(doc, &xmlbuff, &buffersize, 1);
+    std::string s((const char*)xmlbuff);
+    xmlFree(xmlbuff);
+    return s;
+}
+
 static xmlNodeSetPtr executeXPath(xmlDocPtr doc, const xmlChar* xpathExpr)
 {
     xmlXPathContextPtr xpathCtx;

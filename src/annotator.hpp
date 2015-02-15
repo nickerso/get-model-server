@@ -17,10 +17,23 @@ public:
     std::string loadSource(const std::string& url);
 
     /**
+     * Serialise the current source file back out to its location that we already know.
+     * @return A JSON object defining a returnCode which will be non-zero on error.
+     */
+    std::string saveSource() const;
+
+    /**
      * Return the list of CellML components in the current source document.
      * @return A JSON object defining the current CellML components in the source model.
      */
     std::string getSourceComponents() const;
+
+    /**
+     * This method will be called in response to data being POST'ed to the annotator URL.
+     * @param jsonData The JSON object POST'ed.
+     * @return A JSON object with a returnCode of zero on success.
+     */
+    std::string handlePostData(const std::string& jsonData);
 
 private:
     Annotator();

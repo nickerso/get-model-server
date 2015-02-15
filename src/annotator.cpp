@@ -46,7 +46,7 @@ std::string Annotator::loadSource(const std::string &url)
         return response;
     }
     // success
-    mSourceFile = url;
+    mSourceFile = mRepositoryLocalPath + url;
     Json::Value root;
     root["returnCode"] = 0;
     response = Json::FastWriter().write(root);
@@ -68,5 +68,58 @@ std::string Annotator::getSourceComponents() const
     }
     root["returnCode"] = 0;
     response = Json::FastWriter().write(root);
+    return response;
+}
+
+std::string Annotator::handlePostData(const std::string& jsonData)
+{
+    Json::Value returnCode;
+    std::string response;
+    Json::Value root;
+    Json::Reader reader;
+    bool parsingSuccessful = reader.parse(jsonData, root);
+    if (!parsingSuccessful)
+    {
+        // report to the user the failure and their locations in the document.
+        std::cerr  << "Failed to parse JSON data in annotator post"
+                   << reader.getFormattedErrorMessages();
+        returnCode["returnCode"] = 1;
+        response = Json::FastWriter().write(returnCode);
+        return response;
+    }
+    std::string dataType = root["type"].asString();
+    if (dataType.size() == 0)
+    {
+        std::cerr  << "Failed to get a data type from the JSON data in annotator post\n"
+                   << std::endl;
+        returnCode["returnCode"] = 2;
+        response = Json::FastWriter().write(returnCode);
+        return response;
+    }
+    if (dataType == "cellmlComponent")
+    {
+        // create a new component in the source document
+        if (mSourceDocument->createCellmlComponent(root["name"].asString(), root["id"].asString()) != 0)
+        {
+            std::cerr  << "ERROR creating CellML Component in source document\n"
+                       << std::endl;
+            returnCode["returnCode"] = 3;
+            response = Json::FastWriter().write(returnCode);
+            return response;
+        }
+    }
+    returnCode["returnCode"] = 0;
+    response = Json::FastWriter().write(returnCode);
+    return response;
+}
+
+std::string Annotator::saveSource() const
+{
+    Json::Value returnCode;
+    std::string response;
+    std::cout << "New model to save to:" << mSourceFile << std::endl;
+    std::cout << mSourceDocument->asString() << std::endl;
+    returnCode["returnCode"] = 0;
+    response = Json::FastWriter().write(returnCode);
     return response;
 }

@@ -398,6 +398,12 @@ std::string API::handleAnnotatorRequest(const std::string& url, const std::map<s
         std::string sourceUrl = urlChildOf(trailer, "loadSource/");
         response = annotator->loadSource(sourceUrl);
     }
+    else if (action == "saveSource")
+    {
+        // FIXME: this is dodgy :)
+        // save the source XML document to be annotated
+        response = annotator->saveSource();
+    }
     else if (action == "getSourceComponents")
     {
         // return the CellML components in the source document

@@ -9,6 +9,8 @@
 #include "gmsData.hpp"
 #include "gmsApi.hpp"
 #include "biomaps.hpp"
+#include "annotator.hpp"
+#include "utils.hpp"
 
 #define PAGE "<html><head><title>libmicrohttpd demo</title>"\
              "</head><body>libmicrohttpd demo</body></html>"
@@ -172,6 +174,7 @@ static int get_url_args(void *cls, MHD_ValueKind kind, const char *key,
  */
 struct connection_info
 {
+    std::string url;
     char* biomapsId;
     int id;
     int connectiontype;
@@ -242,12 +245,14 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
         if (NULL == con_info) return MHD_NO;
         static int idCounter = 1;
         con_info->id = idCounter++;
+        con_info->url = std::string(url);
         con_info->data = NULL;
         con_info->biomapsId = NULL;
         con_info->dataSize = 0;
         if (0 == strcmp (method, MHD_HTTP_METHOD_POST))
         {
             std::cout << "Setting up con_cls for POST: " << con_info->id << std::endl;
+            std::cout << " - with url: " << url << std::endl;
             std::string contentType(MHD_lookup_connection_value(connection, MHD_HEADER_KIND, "Content-type"));
             if (contentType.find(JSON_CONTENT_TYPE) == std::string::npos)
             {
@@ -257,9 +262,13 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
                 free (con_info);
                 return MHD_NO;
             }
-            Biomaps* biomaps = data->getBiomaps();
-            if (biomaps) con_info->biomapsId = biomaps->createDatasetId();
-            else std::cerr << "Where is you Biomaps manager?!" << std::endl;
+            std::string child = urlChildOf(url, GMS::API::URL_BIOMAPS);
+            if (child.length() > 0)
+            {
+                Biomaps* biomaps = data->getBiomaps();
+                if (biomaps) con_info->biomapsId = biomaps->createDatasetId();
+                else std::cerr << "Where is you Biomaps manager?!" << std::endl;
+            }
             con_info->connectiontype = POST;
         }
         else con_info->connectiontype = GET;
@@ -288,10 +297,21 @@ static int url_handler(void *cls, struct MHD_Connection *connection,
         }
         else
         {
-            std::cout << "No more data to process?" << std::endl;
-            respdata = "{\"datasetId\": \"";
-            respdata += con_info->biomapsId;
-            respdata += "\"}";
+
+            std::string child = urlChildOf(url, GMS::API::URL_BIOMAPS);
+            if (child.length() > 0)
+            {
+                std::cout << "No more data to process?" << std::endl;
+                respdata = "{\"datasetId\": \"";
+                respdata += con_info->biomapsId;
+                respdata += "\"}";
+            }
+            child = urlChildOf(url, GMS::API::URL_ANNOTATOR);
+            if (child.length() > 0)
+            {
+                Annotator* annotator = data->getAnnotator();
+                respdata = annotator->handlePostData(con_info->data);
+            }
         }
     }
     else if (0 == strcmp(method, MHD_HTTP_METHOD_GET))

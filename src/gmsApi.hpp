@@ -28,6 +28,14 @@ namespace GMS
         ~API();
         std::string executeAPI(const std::string& url, const std::map<std::string, std::string>& argvals,
                 GMS::Data* data);
+        // these are the root URL's that we support
+        static const std::string URL_MODEL;
+        static const std::string URL_SEARCH;
+        static const std::string URL_QUERY;
+        static const std::string URL_DOJO_TEST; // provides some test JSON data from Dojo examples
+        static const std::string URL_BIOMAPS;
+        static const std::string URL_ANNOTATOR;
+
     private:
         void getInvalidResponse(std::string& response);
         std::string handleModelRequest(const std::string& url, const std::map<std::string, std::string>& argvals,
@@ -40,13 +48,6 @@ namespace GMS
                                        GMS::Data* data);
         std::string handleDojoTestRequest(const std::string& url, const std::map<std::string, std::string>& argvals);
 
-        // these are the root URL's that we support
-        static const std::string URL_MODEL;
-        static const std::string URL_SEARCH;
-        static const std::string URL_QUERY;
-        static const std::string URL_DOJO_TEST; // provides some test JSON data from Dojo examples
-        static const std::string URL_BIOMAPS;
-        static const std::string URL_ANNOTATOR;
     };
 }
 #endif // GMSAPI_HPP
