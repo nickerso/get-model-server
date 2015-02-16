@@ -11,9 +11,11 @@
 #include "annotator.hpp"
 #include "xmlDoc.hpp"
 #include "utils.hpp"
+#include "rdfgraph.hpp"
 
 Annotator::Annotator(const std::string& repositoryRoot, const std::string& repositoryLocalPath) :
-    mRepositoryRoot(repositoryRoot), mRepositoryLocalPath(repositoryLocalPath), mSourceDocument(0)
+    mRepositoryRoot(repositoryRoot), mRepositoryLocalPath(repositoryLocalPath), mSourceDocument(0),
+    mRdfGraph(0)
 {
 
 }
@@ -21,6 +23,7 @@ Annotator::Annotator(const std::string& repositoryRoot, const std::string& repos
 Annotator::~Annotator()
 {
     if (mSourceDocument) delete mSourceDocument;
+    if (mRdfGraph) delete mRdfGraph;
 }
 
 std::string Annotator::loadSource(const std::string &url)
@@ -48,6 +51,22 @@ std::string Annotator::loadSource(const std::string &url)
     }
     // success
     mSourceFile = mRepositoryLocalPath + url;
+    Json::Value root;
+    root["returnCode"] = 0;
+    response = Json::FastWriter().write(root);
+    return response;
+}
+
+std::string Annotator::loadAnnotations(const std::string &url)
+{
+    std::string response;
+    std::string annotationsUrl = mRepositoryRoot + url;
+    std::cout << "creating RDF graph from: " << annotationsUrl << std::endl;
+    mRdfGraph = new RdfGraph();
+    mRdfGraph->parseRdfXmlUrl(annotationsUrl);
+    mRdfGraph->cacheGraph();
+    // success
+    mAnnotationsFile = mRepositoryLocalPath + url;
     Json::Value root;
     root["returnCode"] = 0;
     response = Json::FastWriter().write(root);

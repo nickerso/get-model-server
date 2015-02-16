@@ -404,6 +404,12 @@ std::string API::handleAnnotatorRequest(const std::string& url, const std::map<s
         // save the source XML document to be annotated
         response = annotator->saveSource();
     }
+    else if (action == "loadAnnotations")
+    {
+        // load the annotations into our RDF graph
+        std::string annotationsUrl = urlChildOf(trailer, "loadAnnotations/");
+        response = annotator->loadAnnotations(annotationsUrl);
+    }
     else if (action == "getSourceComponents")
     {
         // return the CellML components in the source document

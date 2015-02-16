@@ -48,6 +48,15 @@ public:
       */
     std::vector<std::string> getResourceProtocolUris(const std::string& uri);
 
+    /**
+     * Return the current cached graph as a string.
+     * @return The RDF/XML string representation of the current cached graph.
+     */
+    inline const std::string& getGraphCache() const
+    {
+        return mGraphCache;
+    }
+
 private:
     RedlandContainer* mRedlandContainer;
     std::string mGraphCache;

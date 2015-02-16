@@ -2,6 +2,8 @@
 #define ANNOTATOR_HPP
 
 class XmlDoc;
+class RdfGraph;
+
 class Annotator
 {
 public:
@@ -23,6 +25,14 @@ public:
     std::string saveSource() const;
 
     /**
+     * Loads the given annotations document for viewing/editing. We currently only support having a single annotations
+     * document loaded at any given time.
+     * @param url The URL of the document to load, relative to the known repository root.
+     * @return A JSON object defining a returnCode which will be non-zero on error.
+     */
+    std::string loadAnnotations(const std::string& url);
+
+    /**
      * Return the list of CellML components in the current source document.
      * @return A JSON object defining the current CellML components in the source model.
      */
@@ -40,7 +50,9 @@ private:
     std::string mRepositoryRoot;
     std::string mRepositoryLocalPath;
     std::string mSourceFile;
+    std::string mAnnotationsFile;
     XmlDoc* mSourceDocument;
+    RdfGraph* mRdfGraph;
 };
 
 #endif // ANNOTATOR_HPP
