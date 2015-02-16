@@ -33,6 +33,12 @@ public:
     std::string loadAnnotations(const std::string& url);
 
     /**
+     * Serialise the current annotations file back out to its location that we already know.
+     * @return A JSON object defining a returnCode which will be non-zero on error.
+     */
+    std::string saveAnnotations() const;
+
+    /**
      * Return the list of CellML components in the current source document.
      * @return A JSON object defining the current CellML components in the source model.
      */

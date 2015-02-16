@@ -187,6 +187,20 @@ std::string Annotator::saveSource() const
     return response;
 }
 
+std::string Annotator::saveAnnotations() const
+{
+    Json::Value returnCode;
+    std::string response;
+    std::cout << "New annotations to save to:" << mAnnotationsFile << std::endl;
+    std::cout << mRdfGraph->getGraphCache() << std::endl;
+    std::ofstream output;
+    output.open(mAnnotationsFile);
+    output << mRdfGraph->getGraphCache();
+    returnCode["returnCode"] = 0;
+    response = Json::FastWriter().write(returnCode);
+    return response;
+}
+
 std::string Annotator::fetchAnnotations(const std::string& sourceId)
 {
     Json::Value results;
