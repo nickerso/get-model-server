@@ -2,6 +2,7 @@
 #define RDFGRAPH_HPP
 
 class RedlandContainer;
+struct librdf_model_s;
 
 class RdfGraph
 {
@@ -58,6 +59,15 @@ public:
     }
 
     /**
+     * Create a new triple in the cached graph.
+     * @param source The URI of the source for the triple.
+     * @param predicate The URI of the predicate for the triple.
+     * @param object The URI of the object of the triple.
+     * @return zero on success.
+     */
+    int createTriple(const std::string& source, const std::string& predicate, const std::string& object);
+
+    /**
      * Return the object URI for each annotation consisting of the given resource and qulaifier.
      * @param resourceUri The resource URI to query for.
      * @param qualifierUri The predicate URI.
@@ -69,6 +79,7 @@ public:
 private:
     RedlandContainer* mRedlandContainer;
     std::string mGraphCache;
+    void cacheGraphFromModel(librdf_model_s* model);
 };
 
 #endif // RDFGRAPH_HPP
