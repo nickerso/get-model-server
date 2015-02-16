@@ -14,6 +14,28 @@
 #include "rdfgraph.hpp"
 #include "namespaces.hpp"
 
+static std::pair<std::string, std::string> parseUri(const std::string& uri)
+{
+    std::pair<std::string, std::string> p;
+    std::string child = urlChildOf(uri, ID_ORG_UNIPROT);
+    if (child.size() > 0)
+    {
+        p.first = UNIPROT_NAME;
+        p.second = child;
+        return p;
+    }
+    child = urlChildOf(uri, ID_ORG_FMA);
+    if (child.size() > 0)
+    {
+        p.first = FMA_NAME;
+        p.second = child;
+        return p;
+    }
+    p.first = "UNKNOWN";
+    p.second = "UNKNOWN_ID";
+    return p;
+}
+
 Annotator::Annotator(const std::string& repositoryRoot, const std::string& repositoryLocalPath) :
     mRepositoryRoot(repositoryRoot), mRepositoryLocalPath(repositoryLocalPath), mSourceDocument(0),
     mRdfGraph(0)
@@ -156,11 +178,22 @@ std::string Annotator::fetchAnnotations(const std::string& sourceId)
     std::string sourceUri = mSourceUrl + "#";
     sourceUri += sourceId;
     // first the bqmodel:isInstanceOf annotations
-    std::vector<std::string> objects = mRdfGraph->getAnnotationsForResource(sourceUri,
-                                                                            BQMODEL_NS "isInstanceOf");
+    std::string qualifier(BQMODEL_NS "isInstanceOf");
+    std::vector<std::string> objects = mRdfGraph->getAnnotationsForResource(sourceUri, qualifier);
+    int i = 0;
     if (objects.size() > 0)
     {
         std::cout << "Found some instanceOf anntations for: " << sourceUri << std::endl;
+        for (const auto& u: objects)
+        {
+            Json::Value object;
+            object["qualifier"] = qualifier;
+            object["uri"] = u;
+            std::pair<std::string, std::string> ontology = parseUri(u);
+            object["ontology"] = ontology.first;
+            object["identifier"] = ontology.second;
+            results["annotations"][i++] = object;
+        }
     }
     results["returnCode"] = 0;
     response = Json::FastWriter().write(results);
