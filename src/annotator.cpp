@@ -2,6 +2,7 @@
 #include <sstream>
 #include <cstring>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <algorithm>
 #include <json/json.h>
@@ -119,6 +120,9 @@ std::string Annotator::saveSource() const
     std::string response;
     std::cout << "New model to save to:" << mSourceFile << std::endl;
     std::cout << mSourceDocument->asString() << std::endl;
+    std::ofstream output;
+    output.open(mSourceFile);
+    output << mSourceDocument->asString();
     returnCode["returnCode"] = 0;
     response = Json::FastWriter().write(returnCode);
     return response;
