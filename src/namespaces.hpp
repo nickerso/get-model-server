@@ -35,8 +35,12 @@
 
 #define ID_ORG_UNIPROT              "http://identifiers.org/uniprot/"
 #define ID_ORG_FMA                  "http://identifiers.org/fma/"
+#define ID_ORG_DOI                  "http://identifiers.org/doi/"
+#define ID_ORG_PUBMED               "http://identifiers.org/pubmed/"
 
 #define UNIPROT_NAME                "UNIPROT"
 #define FMA_NAME                    "FMA"
+#define DOI_NAME                    "DOI"
+#define PUBMED_NAME                 "PUBMED"
 
 #endif // NAMESPACES_HPP
