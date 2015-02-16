@@ -415,6 +415,12 @@ std::string API::handleAnnotatorRequest(const std::string& url, const std::map<s
         // return the CellML components in the source document
         response = annotator->getSourceComponents();
     }
+    else if (action == "annotations")
+    {
+        // fetch the annotations we know about for the given id
+        std::string sourceId = urlChildOf(trailer, "annotations/");
+        response = annotator->fetchAnnotations(sourceId);
+    }
     else
     {
         // unhandled annotator request

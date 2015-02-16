@@ -395,3 +395,36 @@ std::vector<std::string> RdfGraph::getResourceProtocolUris(const std::string &ur
     librdf_free_query(query);
     return uris;
 }
+
+std::vector<std::string> RdfGraph::getAnnotationsForResource(const std::string &resourceUri, const std::string &qualifierUri)
+{
+    RedlandGraph rdf(mRedlandContainer->world, mGraphCache);
+    std::vector<std::string> r;
+    std::string queryString = "select * where { <";
+    queryString += resourceUri;
+    queryString += "> <";
+    queryString += qualifierUri;
+    queryString += "> ?a }";
+    std::cout << "query string: " << queryString.c_str() << std::endl;
+    librdf_query* query = librdf_new_query(mRedlandContainer->world, "sparql", NULL, (const unsigned char*)(queryString.c_str()), NULL);
+    librdf_query_results* results = librdf_model_query_execute(rdf.model, query);
+    if (results)
+    {
+        if (librdf_query_results_is_bindings(results))
+        {
+            while (!librdf_query_results_finished(results))
+            {
+                //std::cout << "bobby!" << std::endl;
+                librdf_node* node = librdf_query_results_get_binding_value_by_name(results, "a");
+                librdf_uri* uri = librdf_node_get_uri(node);
+                librdf_free_node(node);
+                r.push_back(std::string((char*)(librdf_uri_as_string(uri))));
+                librdf_query_results_next(results);
+            }
+        }
+        librdf_free_query_results(results);
+    }
+    librdf_free_query(query);
+    return r;
+}
+
