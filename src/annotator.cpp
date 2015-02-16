@@ -12,6 +12,7 @@
 #include "xmlDoc.hpp"
 #include "utils.hpp"
 #include "rdfgraph.hpp"
+#include "namespaces.hpp"
 
 Annotator::Annotator(const std::string& repositoryRoot, const std::string& repositoryLocalPath) :
     mRepositoryRoot(repositoryRoot), mRepositoryLocalPath(repositoryLocalPath), mSourceDocument(0),
@@ -50,6 +51,7 @@ std::string Annotator::loadSource(const std::string &url)
         return response;
     }
     // success
+    mSourceUrl = sourceUrl;
     mSourceFile = mRepositoryLocalPath + url;
     Json::Value root;
     root["returnCode"] = 0;
@@ -144,5 +146,23 @@ std::string Annotator::saveSource() const
     output << mSourceDocument->asString();
     returnCode["returnCode"] = 0;
     response = Json::FastWriter().write(returnCode);
+    return response;
+}
+
+std::string Annotator::fetchAnnotations(const std::string& sourceId)
+{
+    Json::Value results;
+    std::string response;
+    std::string sourceUri = mSourceUrl + "#";
+    sourceUri += sourceId;
+    // first the bqmodel:isInstanceOf annotations
+    std::vector<std::string> objects = mRdfGraph->getAnnotationsForResource(sourceUri,
+                                                                            BQMODEL_NS "isInstanceOf");
+    if (objects.size() > 0)
+    {
+        std::cout << "Found some instanceOf anntations for: " << sourceUri << std::endl;
+    }
+    results["returnCode"] = 0;
+    response = Json::FastWriter().write(results);
     return response;
 }

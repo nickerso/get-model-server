@@ -57,6 +57,15 @@ public:
         return mGraphCache;
     }
 
+    /**
+     * Return the object URI for each annotation consisting of the given resource and qulaifier.
+     * @param resourceUri The resource URI to query for.
+     * @param qualifierUri The predicate URI.
+     * @return A vector of URIs as strings.
+     */
+    std::vector<std::string> getAnnotationsForResource(const std::string &resourceUri,
+                                                       const std::string &qualifierUri);
+
 private:
     RedlandContainer* mRedlandContainer;
     std::string mGraphCache;

@@ -45,11 +45,20 @@ public:
      */
     std::string handlePostData(const std::string& jsonData);
 
+    /**
+     * Fetch the annotations we know about for the given source ID.
+     * @param sourceId The source ID for which we will look for existing annotations.
+     * @return A JSON object containing the annotations. Will also define a returnCode which will
+     * have a non-zero value on error.
+     */
+    std::string fetchAnnotations(const std::string& sourceId);
+
 private:
     Annotator();
     std::string mRepositoryRoot;
     std::string mRepositoryLocalPath;
     std::string mSourceFile;
+    std::string mSourceUrl;
     std::string mAnnotationsFile;
     XmlDoc* mSourceDocument;
     RdfGraph* mRdfGraph;
