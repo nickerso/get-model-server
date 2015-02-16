@@ -32,4 +32,10 @@
 
 #define CELLML_1_1_PREFIX "cellml"
 
+#define ID_ORG_UNIPROT              "http://identifiers.org/uniprot/"
+#define ID_ORG_FMA                  "http://identifiers.org/fma/"
+
+#define UNIPROT_NAME                "UNIPROT"
+#define FMA_NAME                    "FMA"
+
 #endif // NAMESPACES_HPP
