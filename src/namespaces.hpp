@@ -16,6 +16,7 @@
 #define DCTERMS_NS           "http://purl.org/dc/terms/"
 #define VCARD_NS             "http://www.w3.org/2001/vcard-rdf/3.0#"
 #define XML_NS               "http://www.w3.org/XML/1998/namespace"
+#define OBO_RO_NS            "http://www.obofoundry.org/ro/ro.owl#"
 
 #define CSIM_NS              "http://cellml.sourceforge.net/csim/metadata/0.1#"
 #define CSIM_NS2             "http://cellml.sourceforge.net/ns"
