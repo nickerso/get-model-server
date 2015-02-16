@@ -31,6 +31,20 @@ static std::pair<std::string, std::string> parseUri(const std::string& uri)
         p.second = child;
         return p;
     }
+    child = urlChildOf(uri, ID_ORG_DOI);
+    if (child.size() > 0)
+    {
+        p.first = DOI_NAME;
+        p.second = child;
+        return p;
+    }
+    child = urlChildOf(uri, ID_ORG_PUBMED);
+    if (child.size() > 0)
+    {
+        p.first = PUBMED_NAME;
+        p.second = child;
+        return p;
+    }
     p.first = "UNKNOWN";
     p.second = "UNKNOWN_ID";
     return p;
@@ -231,6 +245,23 @@ std::string Annotator::fetchAnnotations(const std::string& sourceId)
     if (objects.size() > 0)
     {
         std::cout << "Found some ro:located_in anntations for: " << sourceUri << std::endl;
+        for (const auto& u: objects)
+        {
+            Json::Value object;
+            object["qualifier"] = qualifier;
+            object["uri"] = u;
+            std::pair<std::string, std::string> ontology = parseUri(u);
+            object["ontology"] = ontology.first;
+            object["identifier"] = ontology.second;
+            results["annotations"][i++] = object;
+        }
+    }
+    // then the bqmodel:isDescribedBy annotations
+    qualifier = std::string(BQMODEL_NS "isDescribedBy");
+    objects = mRdfGraph->getAnnotationsForResource(sourceUri, qualifier);
+    if (objects.size() > 0)
+    {
+        std::cout << "Found some bqmodel:isDescribedBy annotations for: " << sourceUri << std::endl;
         for (const auto& u: objects)
         {
             Json::Value object;
