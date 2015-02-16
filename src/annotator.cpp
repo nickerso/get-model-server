@@ -195,6 +195,23 @@ std::string Annotator::fetchAnnotations(const std::string& sourceId)
             results["annotations"][i++] = object;
         }
     }
+    // then the ro:located_in annotations
+    qualifier = std::string(OBO_RO_NS "located_in");
+    objects = mRdfGraph->getAnnotationsForResource(sourceUri, qualifier);
+    if (objects.size() > 0)
+    {
+        std::cout << "Found some ro:located_in anntations for: " << sourceUri << std::endl;
+        for (const auto& u: objects)
+        {
+            Json::Value object;
+            object["qualifier"] = qualifier;
+            object["uri"] = u;
+            std::pair<std::string, std::string> ontology = parseUri(u);
+            object["ontology"] = ontology.first;
+            object["identifier"] = ontology.second;
+            results["annotations"][i++] = object;
+        }
+    }
     results["returnCode"] = 0;
     response = Json::FastWriter().write(results);
     return response;
