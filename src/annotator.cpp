@@ -152,6 +152,22 @@ std::string Annotator::handlePostData(const std::string& jsonData)
             return response;
         }
     }
+    else if (dataType == "annotation")
+    {
+        // create a new annotation
+        std::string sourceUri = mSourceUrl + "#";
+        sourceUri += root["sourceId"].asString();
+        std::string qualifier = root["qualifier"].asString();
+        std::string object = root["uri"].asString();
+        if (mRdfGraph->createTriple(sourceUri, qualifier, object) != 0)
+        {
+            std::cerr  << "ERROR creating annotation in RDF Graph\n"
+                       << std::endl;
+            returnCode["returnCode"] = 4;
+            response = Json::FastWriter().write(returnCode);
+            return response;
+        }
+    }
     returnCode["returnCode"] = 0;
     response = Json::FastWriter().write(returnCode);
     return response;

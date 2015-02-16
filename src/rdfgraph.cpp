@@ -175,6 +175,16 @@ void RdfGraph::cacheGraph()
     std::cout << "Cached RDF graph: **@@" << mGraphCache.c_str() << "@@**" << std::endl;
 }
 
+void RdfGraph::cacheGraphFromModel(librdf_model* model)
+{
+    size_t n;
+    unsigned char* s = librdf_model_to_counted_string(model, NULL, "rdfxml", NULL, NULL, &n);
+    std::string graphString((char*)s, n);
+    librdf_free_memory(s);
+    mGraphCache = graphString;
+    std::cout << "Cached RDF graph: **@@" << mGraphCache.c_str() << "@@**" << std::endl;
+}
+
 std::vector<std::string> RdfGraph::getModelsOfType(const std::string& typeUri)
 {
     RedlandGraph rdf(mRedlandContainer->world, mGraphCache);
@@ -428,3 +438,23 @@ std::vector<std::string> RdfGraph::getAnnotationsForResource(const std::string &
     return r;
 }
 
+int RdfGraph::createTriple(const std::string& source, const std::string& predicate, const std::string& object)
+{
+    std::cout << "Creating new triple: " << source << " -- " << predicate << " -- " << object << std::endl;
+    RedlandGraph rdf(mRedlandContainer->world, mGraphCache);
+    librdf_node* sourceNode = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                              (const unsigned char*)(source.c_str()));
+    librdf_node* predicateNode = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                                 (const unsigned char*)(predicate.c_str()));
+    librdf_node* objectNode = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                              (const unsigned char*)(object.c_str()));
+    librdf_statement* triple = librdf_new_statement_from_nodes(mRedlandContainer->world, sourceNode, predicateNode,
+                                                               objectNode);
+    int returnCode = librdf_model_add_statement(rdf.model, triple);
+    if (returnCode == 0)
+    {
+        // update the cached graph which is what is used
+        cacheGraphFromModel(rdf.model);
+    }
+    return returnCode;
+}
