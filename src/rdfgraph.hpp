@@ -88,6 +88,16 @@ public:
     std::vector<std::string> getAnnotationsForResource(const std::string &resourceUri,
                                                        const std::string &qualifierUri);
 
+    /**
+     * Look for evidence in support of a given statement.
+     * @param sourceUri The URI of the source for the statement being supported.
+     * @param predicateUri The URI of the predicate for the statement being supported.
+     * @param objectUri The URI of the object for the statement being supported.
+     * @return A list of string pairs defining the evidence qualifier (predicate) and evidence identifer.
+     */
+    std::vector<std::pair<std::string, std::string> > getEvidenceForStatement(
+            const std::string& sourceUri, const std::string& predicateUri, const std::string& objectUri);
+
 private:
     RedlandContainer* mRedlandContainer;
     std::string mGraphCache;

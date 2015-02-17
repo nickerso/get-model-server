@@ -439,6 +439,63 @@ std::vector<std::string> RdfGraph::getAnnotationsForResource(const std::string &
     return r;
 }
 
+std::vector<std::pair<std::string, std::string> > RdfGraph::getEvidenceForStatement(
+        const std::string& sourceUri, const std::string& predicateUri, const std::string& objectUri)
+{
+    RedlandGraph rdf(mRedlandContainer->world, mGraphCache);
+    std::vector<std::pair<std::string, std::string> > r;
+//    prefix  rdf: <RDF_NS>
+//    select * where { ?x rdf:type rdf:Statement ;
+//                        rdf:subject <sourceUri> ;
+//                        rdf:predicate <predicateUri> ;
+//                        rdf:object <objectUri> ;
+//                        ?q ?i
+//                        filter (!regex(str(?q), RDF_NS))}  to remove all the rdf: predicates
+    std::string queryString = "prefix rdf: <" RDF_NS ">\n";
+    queryString += "select * where { ?x rdf:type rdf:Statement ;\n";
+    queryString += "                    rdf:subject <";
+    queryString += sourceUri;
+    queryString += "> ;\n";
+    queryString += "                    rdf:predicate <";
+    queryString += predicateUri;
+    queryString += "> ;\n";
+    queryString += "                    rdf:object <";
+    queryString += objectUri;
+    queryString += "> ;\n";
+    queryString += " ?q ?i filter (!regex(str(?q), \"" RDF_NS "\"))}";
+    std::cout << "query string: " << queryString.c_str() << std::endl;
+    librdf_query* query = librdf_new_query(mRedlandContainer->world, "sparql", NULL,
+                                           (const unsigned char*)(queryString.c_str()), NULL);
+    librdf_query_results* results = librdf_model_query_execute(rdf.model, query);
+    if (results)
+    {
+        std::cout << "Found some results for evidence" << std::endl;
+        if (librdf_query_results_is_bindings(results))
+        {
+            std::cout << "Found some BINDINGS results for evidence" << std::endl;
+            while (!librdf_query_results_finished(results))
+            {
+                std::cout << "Evidence result:" << std::endl;
+                std::pair<std::string, std::string> p;
+                librdf_node* node = librdf_query_results_get_binding_value_by_name(results, "q");
+                librdf_uri* uri = librdf_node_get_uri(node);
+                librdf_free_node(node);
+                p.first = std::string((char*)(librdf_uri_as_string(uri)));
+                node = librdf_query_results_get_binding_value_by_name(results, "i");
+                uri = librdf_node_get_uri(node);
+                librdf_free_node(node);
+                p.second = std::string((char*)(librdf_uri_as_string(uri)));
+                std::cout << "qualifier: " << p.first << "; identifier" << p.second << std::endl;
+                r.push_back(p);
+                librdf_query_results_next(results);
+            }
+        }
+        librdf_free_query_results(results);
+    }
+    librdf_free_query(query);
+    return r;
+}
+
 int RdfGraph::createTriple(const std::string& source, const std::string& predicate, const std::string& object)
 {
     std::cout << "Creating new triple: " << source << " -- " << predicate << " -- " << object << std::endl;
