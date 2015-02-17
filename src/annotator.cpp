@@ -250,6 +250,23 @@ std::string Annotator::fetchAnnotations(const std::string& sourceId)
             std::pair<std::string, std::string> ontology = parseUri(u);
             object["ontology"] = ontology.first;
             object["identifier"] = ontology.second;
+            // can we also find any evidence for this annotation
+            std::vector<std::pair<std::string, std::string> > evidence =
+                    mRdfGraph->getEvidenceForStatement(sourceUri, qualifier, u);
+            if (evidence.size() > 0)
+            {
+                int j = 0;
+                for (const auto& p: evidence)
+                {
+                    Json::Value e;
+                    e["qualifier"] = p.first;
+                    ontology = parseUri(p.second);
+                    e["ontology"] = ontology.first;
+                    e["identifier"] = ontology.second;
+                    object["evidence"][j++] = e;
+                }
+            }
+            // add this annotation to the collection
             results["annotations"][i++] = object;
         }
     }
@@ -267,6 +284,23 @@ std::string Annotator::fetchAnnotations(const std::string& sourceId)
             std::pair<std::string, std::string> ontology = parseUri(u);
             object["ontology"] = ontology.first;
             object["identifier"] = ontology.second;
+            // can we also find any evidence for this annotation
+            std::vector<std::pair<std::string, std::string> > evidence =
+                    mRdfGraph->getEvidenceForStatement(sourceUri, qualifier, u);
+            if (evidence.size() > 0)
+            {
+                int j = 0;
+                for (const auto& p: evidence)
+                {
+                    Json::Value e;
+                    e["qualifier"] = p.first;
+                    ontology = parseUri(p.second);
+                    e["ontology"] = ontology.first;
+                    e["identifier"] = ontology.second;
+                    object["evidence"][j++] = e;
+                }
+            }
+            // add this annotation to the collection
             results["annotations"][i++] = object;
         }
     }
@@ -284,6 +318,23 @@ std::string Annotator::fetchAnnotations(const std::string& sourceId)
             std::pair<std::string, std::string> ontology = parseUri(u);
             object["ontology"] = ontology.first;
             object["identifier"] = ontology.second;
+            // can we also find any evidence for this annotation
+            std::vector<std::pair<std::string, std::string> > evidence =
+                    mRdfGraph->getEvidenceForStatement(sourceUri, qualifier, u);
+            if (evidence.size() > 0)
+            {
+                int j = 0;
+                for (const auto& p: evidence)
+                {
+                    Json::Value e;
+                    e["qualifier"] = p.first;
+                    ontology = parseUri(p.second);
+                    e["ontology"] = ontology.first;
+                    e["identifier"] = ontology.second;
+                    object["evidence"][j++] = e;
+                }
+            }
+            // add this annotation to the collection
             results["annotations"][i++] = object;
         }
     }
