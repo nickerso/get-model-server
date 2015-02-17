@@ -454,38 +454,70 @@ int RdfGraph::createTriple(const std::string& source, const std::string& predica
     int returnCode = librdf_model_add_statement(rdf.model, triple);
     if (returnCode == 0)
     {
-        std::string describedBy("fred");
-        if (describedBy != "")
-        {
-            // create statements to describe the statement we just created.
-            librdf_node* blankNode = librdf_new_node(mRedlandContainer->world);
-            librdf_node* q = librdf_new_node_from_uri_string(mRedlandContainer->world,
-                                                             (const unsigned char*)(RDF_NS "type"));
-            librdf_node* o = librdf_new_node_from_uri_string(mRedlandContainer->world,
-                                                             (const unsigned char*)(RDF_NS "Statement"));
-            triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, o);
-            librdf_model_add_statement(rdf.model, triple);
-            librdf_free_node(q);
-            librdf_free_node(o);
-            q = librdf_new_node_from_uri_string(mRedlandContainer->world,
-                                                (const unsigned char*)(RDF_NS "subject"));
-            triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, sourceNode);
-            librdf_model_add_statement(rdf.model, triple);
-            librdf_free_node(q);
-            q = librdf_new_node_from_uri_string(mRedlandContainer->world,
-                                                (const unsigned char*)(RDF_NS "predicate"));
-            triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, predicateNode);
-            librdf_model_add_statement(rdf.model, triple);
-            librdf_free_node(q);
-            q = librdf_new_node_from_uri_string(mRedlandContainer->world,
-                                                (const unsigned char*)(RDF_NS "object"));
-            triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, objectNode);
-            librdf_model_add_statement(rdf.model, triple);
-            librdf_free_node(q);
-
-        }
         // update the cached graph which is what is used
         cacheGraphFromModel(rdf.model);
     }
+    return returnCode;
+}
+
+int RdfGraph::addEvidenceToGraph(const std::string& source, const std::string& predicate, const std::string& object,
+                                 const std::string& evidenceQualifier, const std::string& evidenceUri)
+{
+    std::cout << "Creating new evidence triples for the statement: "
+              << source << " -- " << predicate << " -- " << object << std::endl;
+    std::cout << "- with the evidence: " << evidenceQualifier << "--" << evidenceUri << std::endl;
+    RedlandGraph rdf(mRedlandContainer->world, mGraphCache);
+    // create the nodes for the statement we are providing evidence for.
+    librdf_node* sourceNode = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                              (const unsigned char*)(source.c_str()));
+    librdf_node* predicateNode = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                                 (const unsigned char*)(predicate.c_str()));
+    librdf_node* objectNode = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                              (const unsigned char*)(object.c_str()));
+    // create a blank node to use as the source of our evidence annotations
+    librdf_node* blankNode = librdf_new_node(mRedlandContainer->world);
+    // and define the annotations connecting the blank node to the above statement
+    librdf_node* q = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                     (const unsigned char*)(RDF_NS "type"));
+    librdf_node* o = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                     (const unsigned char*)(RDF_NS "Statement"));
+    librdf_statement* triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, o);
+    int returnCode = librdf_model_add_statement(rdf.model, triple);
+    if (returnCode != 0) return returnCode;
+    librdf_free_node(q);
+    librdf_free_node(o);
+    q = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                        (const unsigned char*)(RDF_NS "subject"));
+    triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, sourceNode);
+    returnCode = librdf_model_add_statement(rdf.model, triple);
+    if (returnCode != 0) return returnCode;
+    librdf_free_node(q);
+    q = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                        (const unsigned char*)(RDF_NS "predicate"));
+    triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, predicateNode);
+    returnCode = librdf_model_add_statement(rdf.model, triple);
+    if (returnCode != 0) return returnCode;
+    librdf_free_node(q);
+    q = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                        (const unsigned char*)(RDF_NS "object"));
+    triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, objectNode);
+    returnCode = librdf_model_add_statement(rdf.model, triple);
+    if (returnCode != 0) return returnCode;
+    librdf_free_node(q);
+
+    // and now create the evidence annotation itself
+    q = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                        (const unsigned char*)evidenceQualifier.c_str());
+    o = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                        (const unsigned char*)evidenceUri.c_str());
+    triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, o);
+    returnCode = librdf_model_add_statement(rdf.model, triple);
+    if (returnCode != 0)
+    {
+        std::cerr << "ERROR creating evidence annotation" << std::endl;
+        return returnCode;
+    }
+    // update the cached graph which is what is used
+    cacheGraphFromModel(rdf.model);
     return returnCode;
 }

@@ -68,6 +68,18 @@ public:
     int createTriple(const std::string& source, const std::string& predicate, const std::string& object);
 
     /**
+     * Create and add the evidence annotations to our RDF graph in support of the defined statement.
+     * @param source The URI of the source in the statement we are supporting.
+     * @param predicate The URI of the predicate in the statement we are supporting.
+     * @param object The URI of the object in the statement we are supporting.
+     * @param evidenceQualifier The URI of the predicate to use in defining the evidence annotation.
+     * @param evidenceUri The URI of the evidence object.
+     * @return zero on success.
+     */
+    int addEvidenceToGraph(const std::string& source, const std::string& predicate, const std::string& object,
+                           const std::string& evidenceQualifier, const std::string& evidenceUri);
+
+    /**
      * Return the object URI for each annotation consisting of the given resource and qulaifier.
      * @param resourceUri The resource URI to query for.
      * @param qualifierUri The predicate URI.
