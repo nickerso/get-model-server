@@ -73,7 +73,7 @@ public:
     RedlandGraph(librdf_world* world, const std::string& data)
     {
         std::cout << "Creating a new RDF graph" << std::endl;
-        storage = librdf_new_storage(world, "hashes", NULL, "hash-type='memory'");
+        storage = librdf_new_storage(world, "hashes", NULL, "hash-type='memory',contexts='yes'");
         model = librdf_new_model(world, storage, NULL);
 
         librdf_parser* parser = librdf_new_parser(world, "rdfxml", NULL, NULL);
@@ -109,7 +109,7 @@ public:
         std::cout << "Creating a new RedlandContainer and its own world" << std::endl;
         world = librdf_new_world();
         librdf_world_open(world);
-        storage = librdf_new_storage(world, "hashes", NULL, "hash-type='memory'");
+        storage = librdf_new_storage(world, "hashes", NULL, "hash-type='memory',contexts='yes'");
         model = librdf_new_model(world, storage, NULL);
     }
     ~RedlandContainer()
@@ -450,7 +450,13 @@ int RdfGraph::createTriple(const std::string& source, const std::string& predica
                                                               (const unsigned char*)(object.c_str()));
     librdf_statement* triple = librdf_new_statement_from_nodes(mRedlandContainer->world, sourceNode, predicateNode,
                                                                objectNode);
-    int returnCode = librdf_model_add_statement(rdf.model, triple);
+    librdf_node* contextNode = librdf_new_node_from_blank_identifier(mRedlandContainer->world, (const unsigned char*)("ANDRE_ROCKS"));
+    int returnCode = librdf_model_context_add_statement(rdf.model, contextNode, triple);
+    predicateNode = librdf_new_node_from_uri_string(mRedlandContainer->world,(const unsigned char*)("http://is.described.by/andre"));
+    objectNode = librdf_new_node_from_uri_string(mRedlandContainer->world, (const unsigned char*)("http://identifiers.org/pubmed/12345"));
+    triple = librdf_new_statement_from_nodes(mRedlandContainer->world, contextNode, predicateNode,
+                                                                   objectNode);
+    librdf_model_add_statement(rdf.model, triple);
     if (returnCode == 0)
     {
         // update the cached graph which is what is used
