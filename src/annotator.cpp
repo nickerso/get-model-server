@@ -173,7 +173,7 @@ std::string Annotator::handlePostData(const std::string& jsonData)
         sourceUri += root["sourceId"].asString();
         std::string qualifier = root["qualifier"].asString();
         std::string object = root["uri"].asString();
-        if (mRdfGraph->createTriple(sourceUri, qualifier, object) != 0)
+        if (mRdfGraph->createTriple(sourceUri, qualifier, object, "http://identifiers.org/pubmed/1234567890987654321") != 0)
         {
             std::cerr  << "ERROR creating annotation in RDF Graph\n"
                        << std::endl;

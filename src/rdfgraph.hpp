@@ -63,9 +63,11 @@ public:
      * @param source The URI of the source for the triple.
      * @param predicate The URI of the predicate for the triple.
      * @param object The URI of the object of the triple.
+     * @param describedBy The URI of the publication (?) which describes this statement, if available.
      * @return zero on success.
      */
-    int createTriple(const std::string& source, const std::string& predicate, const std::string& object);
+    int createTriple(const std::string& source, const std::string& predicate, const std::string& object,
+                     const std::string& describedBy);
 
     /**
      * Return the object URI for each annotation consisting of the given resource and qulaifier.

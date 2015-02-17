@@ -438,7 +438,8 @@ std::vector<std::string> RdfGraph::getAnnotationsForResource(const std::string &
     return r;
 }
 
-int RdfGraph::createTriple(const std::string& source, const std::string& predicate, const std::string& object)
+int RdfGraph::createTriple(const std::string& source, const std::string& predicate, const std::string& object,
+                           const std::string& describedBy)
 {
     std::cout << "Creating new triple: " << source << " -- " << predicate << " -- " << object << std::endl;
     RedlandGraph rdf(mRedlandContainer->world, mGraphCache);
@@ -451,8 +452,42 @@ int RdfGraph::createTriple(const std::string& source, const std::string& predica
     librdf_statement* triple = librdf_new_statement_from_nodes(mRedlandContainer->world, sourceNode, predicateNode,
                                                                objectNode);
     int returnCode = librdf_model_add_statement(rdf.model, triple);
+    //librdf_free_statement(triple);
     if (returnCode == 0)
     {
+        if (describedBy != "")
+        {
+            // create statements to describe the statement we just created.
+            librdf_node* blankNode = librdf_new_node(mRedlandContainer->world);
+            librdf_node* q = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                             (const unsigned char*)(RDF_NS "type"));
+            librdf_node* o = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                             (const unsigned char*)(RDF_NS "Statement"));
+            triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, o);
+            librdf_model_add_statement(rdf.model, triple);
+            //librdf_free_statement(triple);
+            librdf_free_node(q);
+            librdf_free_node(o);
+            q = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                (const unsigned char*)(RDF_NS "subject"));
+            triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, sourceNode);
+            librdf_model_add_statement(rdf.model, triple);
+            //librdf_free_statement(triple);
+            librdf_free_node(q);
+            q = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                (const unsigned char*)(RDF_NS "predicate"));
+            triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, predicateNode);
+            librdf_model_add_statement(rdf.model, triple);
+            //librdf_free_statement(triple);
+            librdf_free_node(q);
+            q = librdf_new_node_from_uri_string(mRedlandContainer->world,
+                                                (const unsigned char*)(RDF_NS "object"));
+            triple = librdf_new_statement_from_nodes(mRedlandContainer->world, blankNode, q, objectNode);
+            librdf_model_add_statement(rdf.model, triple);
+            //librdf_free_statement(triple);
+            librdf_free_node(q);
+            // TODO: need the actual statement we want.
+        }
         // update the cached graph which is what is used
         cacheGraphFromModel(rdf.model);
     }
