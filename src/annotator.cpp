@@ -168,7 +168,6 @@ std::string Annotator::handlePostData(const std::string& jsonData)
     }
     else if (dataType == "annotation")
     {
-        std::cout << "Creating a new annotation" << std::endl;
         // create a new annotation
         std::string sourceUri = mSourceUrl + "#";
         sourceUri += root["sourceId"].asString();
@@ -185,9 +184,16 @@ std::string Annotator::handlePostData(const std::string& jsonData)
         Json::Value evidence = root["evidence"];
         if (evidence.isObject())
         {
-            std::cout << "Creating evidence statements" << std::endl;
-            //std::string evidenceQualifier = root["evidence"]["qualifier"].asString();
-            //std::string evidenceUri = root["evidence"]["uri"].asString();
+            std::string evidenceQualifier = root["evidence"]["qualifier"].asString();
+            std::string evidenceUri = root["evidence"]["uri"].asString();
+            if (mRdfGraph->addEvidenceToGraph(sourceUri, qualifier, object, evidenceQualifier, evidenceUri) != 0)
+            {
+                std::cerr  << "ERROR creating evidence annotations in RDF Graph\n"
+                           << std::endl;
+                returnCode["returnCode"] = 5;
+                response = Json::FastWriter().write(returnCode);
+                return response;
+            }
         }
     }
     returnCode["returnCode"] = 0;
