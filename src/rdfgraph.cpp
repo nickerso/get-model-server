@@ -469,13 +469,13 @@ std::vector<std::pair<std::string, std::string> > RdfGraph::getEvidenceForStatem
     librdf_query_results* results = librdf_model_query_execute(rdf.model, query);
     if (results)
     {
-        std::cout << "Found some results for evidence" << std::endl;
+        //std::cout << "Found some results for evidence" << std::endl;
         if (librdf_query_results_is_bindings(results))
         {
-            std::cout << "Found some BINDINGS results for evidence" << std::endl;
+            //std::cout << "Found some BINDINGS results for evidence" << std::endl;
             while (!librdf_query_results_finished(results))
             {
-                std::cout << "Evidence result:" << std::endl;
+                //std::cout << "Evidence result:" << std::endl;
                 std::pair<std::string, std::string> p;
                 librdf_node* node = librdf_query_results_get_binding_value_by_name(results, "q");
                 librdf_uri* uri = librdf_node_get_uri(node);
@@ -485,7 +485,7 @@ std::vector<std::pair<std::string, std::string> > RdfGraph::getEvidenceForStatem
                 uri = librdf_node_get_uri(node);
                 librdf_free_node(node);
                 p.second = std::string((char*)(librdf_uri_as_string(uri)));
-                std::cout << "qualifier: " << p.first << "; identifier" << p.second << std::endl;
+                //std::cout << "qualifier: " << p.first << "; identifier" << p.second << std::endl;
                 r.push_back(p);
                 librdf_query_results_next(results);
             }
