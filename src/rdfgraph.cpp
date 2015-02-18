@@ -182,7 +182,7 @@ void RdfGraph::cacheGraphFromModel(librdf_model* model)
     std::string graphString((char*)s, n);
     librdf_free_memory(s);
     mGraphCache = graphString;
-    std::cout << "Cached RDF graph: **@@" << mGraphCache.c_str() << "@@**" << std::endl;
+    std::cout << "Cached RDF graph: **##" << mGraphCache.c_str() << "##**" << std::endl;
 }
 
 std::vector<std::string> RdfGraph::getModelsOfType(const std::string& typeUri)
