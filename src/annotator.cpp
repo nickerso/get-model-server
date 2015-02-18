@@ -182,18 +182,22 @@ std::string Annotator::handlePostData(const std::string& jsonData)
             return response;
         }
         Json::Value evidence = root["evidence"];
-        if (evidence.isObject())
+        if (evidence.isArray())
         {
-            std::string evidenceQualifier = root["evidence"]["qualifier"].asString();
-            std::string evidenceUri = root["evidence"]["ontology"].asString();
-            evidenceUri += root["evidence"]["identifier"].asString();
-            if (mRdfGraph->addEvidenceToGraph(sourceUri, qualifier, object, evidenceQualifier, evidenceUri) != 0)
+            if (!evidence.empty())
             {
-                std::cerr  << "ERROR creating evidence annotations in RDF Graph\n"
-                           << std::endl;
-                returnCode["returnCode"] = 5;
-                response = Json::FastWriter().write(returnCode);
-                return response;
+                // FIXME: just assume one entry for now.
+                std::string evidenceQualifier = root["evidence"][0]["qualifier"].asString();
+                std::string evidenceUri = root["evidence"][0]["ontology"].asString();
+                evidenceUri += root["evidence"][0]["identifier"].asString();
+                if (mRdfGraph->addEvidenceToGraph(sourceUri, qualifier, object, evidenceQualifier, evidenceUri) != 0)
+                {
+                    std::cerr  << "ERROR creating evidence annotations in RDF Graph\n"
+                               << std::endl;
+                    returnCode["returnCode"] = 5;
+                    response = Json::FastWriter().write(returnCode);
+                    return response;
+                }
             }
         }
     }
