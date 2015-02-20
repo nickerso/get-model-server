@@ -37,10 +37,12 @@
 #define ID_ORG_FMA                  "http://identifiers.org/fma/"
 #define ID_ORG_DOI                  "http://identifiers.org/doi/"
 #define ID_ORG_PUBMED               "http://identifiers.org/pubmed/"
+#define PMR_BASE_URL                "https://models.physiomeproject.org/"
 
 #define UNIPROT_NAME                "UNIPROT"
 #define FMA_NAME                    "FMA"
 #define DOI_NAME                    "DOI"
 #define PUBMED_NAME                 "PUBMED"
+#define PMR_NAME                    "PMR"
 
 #endif // NAMESPACES_HPP
