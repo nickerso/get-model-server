@@ -45,6 +45,13 @@ static std::pair<std::string, std::string> parseUri(const std::string& uri)
         p.second = child;
         return p;
     }
+    child = urlChildOf(uri, PMR_BASE_URL);
+    if (child.size() > 0)
+    {
+        p.first = PMR_NAME;
+        p.second = child;
+        return p;
+    }
     p.first = "UNKNOWN";
     p.second = "UNKNOWN_ID";
     return p;
