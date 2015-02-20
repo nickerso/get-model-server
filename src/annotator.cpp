@@ -350,6 +350,40 @@ std::string Annotator::fetchAnnotations(const std::string& sourceId)
             results["annotations"][i++] = object;
         }
     }
+    // then the bqmodel:hasInstance annotations
+    qualifier = std::string(BQMODEL_NS "hasInstance");
+    objects = mRdfGraph->getAnnotationsForResource(sourceUri, qualifier);
+    if (objects.size() > 0)
+    {
+        std::cout << "Found some bqmodel:hasInstance annotations for: " << sourceUri << std::endl;
+        for (const auto& u: objects)
+        {
+            Json::Value object;
+            object["qualifier"] = qualifier;
+            object["uri"] = u;
+            std::pair<std::string, std::string> ontology = parseUri(u);
+            object["ontology"] = ontology.first;
+            object["identifier"] = ontology.second;
+            // can we also find any evidence for this annotation
+            std::vector<std::pair<std::string, std::string> > evidence =
+                    mRdfGraph->getEvidenceForStatement(sourceUri, qualifier, u);
+            if (evidence.size() > 0)
+            {
+                int j = 0;
+                for (const auto& p: evidence)
+                {
+                    Json::Value e;
+                    e["qualifier"] = p.first;
+                    ontology = parseUri(p.second);
+                    e["ontology"] = ontology.first;
+                    e["identifier"] = ontology.second;
+                    object["evidence"][j++] = e;
+                }
+            }
+            // add this annotation to the collection
+            results["annotations"][i++] = object;
+        }
+    }
     results["returnCode"] = 0;
     response = Json::FastWriter().write(results);
     return response;
